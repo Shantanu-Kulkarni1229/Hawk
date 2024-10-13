@@ -1,48 +1,49 @@
- // Loader script
- const loader = document.getElementById('loader');
- const mainContent = document.getElementById('main-content');
+// Loader script
+const loader = document.getElementById('loader');
+const mainContent = document.getElementById('main-content');
 
- function createLoader() {
-     const scene = new THREE.Scene();
-     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-     const renderer = new THREE.WebGLRenderer();
-     renderer.setSize(window.innerWidth, window.innerHeight);
-     loader.appendChild(renderer.domElement);
+function createLoader() {
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    loader.appendChild(renderer.domElement);
 
-     const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
-     const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
-     const torusKnot = new THREE.Mesh(geometry, material);
-     scene.add(torusKnot);
+    const geometry = new THREE.TorusKnotGeometry(10, 3, 100, 16);
+    const material = new THREE.MeshBasicMaterial({ color: 0x3b82f6, wireframe: true });
+    const torusKnot = new THREE.Mesh(geometry, material);
+    scene.add(torusKnot);
 
-     camera.position.z = 30;
+    camera.position.z = 30;
 
-     const animate = function () {
-         requestAnimationFrame(animate);
-         torusKnot.rotation.x += 0.01;
-         torusKnot.rotation.y += 0.01;
-         renderer.render(scene, camera);
-     };
+    const animate = function () {
+        requestAnimationFrame(animate);
+        torusKnot.rotation.x += 0.01;
+        torusKnot.rotation.y += 0.01;
+        renderer.render(scene, camera);
+    };
 
-     animate();
+    animate();
 
-     setTimeout(() => {
-         loader.style.display = 'none';
-         mainContent.classList.remove('hidden');
-         changePage('dashboard'); // Open dashboard immediately after loader
-     }, 3000);
- }
+    setTimeout(() => {
+        loader.style.display = 'none';
+        mainContent.classList.remove('hidden');
+        changePage('dashboard'); // Open dashboard immediately after loader
+    }, 3000);
+}
 
- createLoader();
+createLoader();
 
- function changePage(page) {
-     const content = document.getElementById('pageContent');
-     const navButtons = document.querySelectorAll('nav button');
-     navButtons.forEach(btn => btn.classList.remove('active-nav'));
-     event.target.classList.add('active-nav');
+function changePage(page) {
+    const content = document.getElementById('pageContent');
+    const navButtons = document.querySelectorAll('nav button');
+    navButtons.forEach(btn => btn.classList.remove('active-nav'));
+    document.querySelector(`nav button[onclick="changePage('${page}')"]`).classList.add('active-nav');
 
-     switch(page) {
-         case 'dashboard':
-             content.innerHTML = `
+    switch(page) {
+        case 'dashboard':
+            content.innerHTML = `
+                
                  <h2 class="text-2xl font-semibold mb-6">Dashboard</h2>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <!-- Device Health -->
@@ -101,12 +102,13 @@
                          </div>
                      </div>
                  </div>
-             `;
-             initCharts();
-             init3DScene();
-             break;
-         case 'vulnerabilities':
-             content.innerHTML = `
+             
+            `;
+            initCharts();
+            init3DScene();
+            break;
+        case 'vulnerabilities':
+            content.innerHTML = `
                  <h2 class="text-2xl font-semibold mb-6">Vulnerabilities</h2>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div class="bg-gray-800 p-6 rounded-lg">
@@ -172,10 +174,10 @@
                      </div>
                  </div>
              `;
-             initVulnerabilityCharts();
-             break;
-         case 'vendors':
-             content.innerHTML = `
+            initVulnerabilityCharts();
+            break;
+        case 'vendors':
+            content.innerHTML = `
                  <h2 class="text-2xl font-semibold mb-6">Vendors and Products</h2>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div class="bg-gray-800 p-6 rounded-lg">
@@ -233,10 +235,10 @@
                      </div>
                  </div>
              `;
-             initVendorCharts();
-             break;
-         case 'solutions':
-             content.innerHTML = `
+            initVendorCharts();
+            break;
+        case 'solutions':
+            content.innerHTML = `
                  <h2 class="text-2xl font-semibold mb-6">Step-by-Step Solutions</h2>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div class="bg-gray-800 p-6 rounded-lg">
@@ -285,10 +287,10 @@
                      </div>
                  </div>
              `;
-             initSolutionCharts();
-             break;
-         case 'alerts':
-             content.innerHTML = `
+            initSolutionCharts();
+            break;
+        case 'alerts':
+            content.innerHTML = `
                  <h2 class="text-2xl font-semibold mb-6">Real-Time Alerts</h2>
                  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                      <div class="bg-gray-800 p-6 rounded-lg">
@@ -347,461 +349,478 @@
                      </div>
                  </div>
              `;
-             initAlertCharts();
-             document.getElementById('alertForm').addEventListener('submit', function(e) {
-                 e.preventDefault();
-                 alert('Alert preferences saved! Integration with notification services would be implemented here.');
-             });
-             break;
-         case 'settings':
-             content.innerHTML = `
-                 <h2 class="text-2xl font-semibold mb-6">Settings</h2>
-                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div class="bg-gray-800 p-6 rounded-lg">
-                         <h3 class="text-xl font-semibold mb-4">Notification Preferences</h3>
-                         <form id="notificationForm" class="space-y-4">
-                             <div>
-                                 <label class="block mb-2">
-                                     <input type="checkbox" name="emailNotif" class="mr-2">
-                                     Email Notifications
-                                 </label>
-                                 <input type="email" placeholder="Enter your email" class="w-full bg-gray-700 p-2 rounded">
-                             </div>
-                             <div>
-                                 <label class="block mb-2">
-                                     <input type="checkbox" name="smsNotif" class="mr-2">
-                                     SMS Notifications
-                                 </label>
-                                 <input type="tel" placeholder="Enter your phone number" class="w-full bg-gray-700 p-2 rounded">
-                             </div>
-                             <div>
-                                 <label class="block mb-2">
-                                     <input type="checkbox" name="pushNotif" class="mr-2">
-                                     Push Notifications
-                                 </label>
-                             </div>
-                             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Preferences</button>
-                         </form>
-                     </div>
-                     <div class="bg-gray-800 p-6 rounded-lg">
-                         <h3 class="text-xl font-semibold mb-4">Security Settings</h3>
-                         <form id="securityForm" class="space-y-4">
-                             <div>
-                                 <label class="block mb-2">Two-Factor Authentication</label>
-                                 <select name="twoFactor" class="w-full bg-gray-700 p-2 rounded">
-                                     <option value="disabled">Disabled</option>
-                                     <option value="sms">SMS</option>
-                                     <option value="app">Authenticator App</option>
-                                 </select>
-                             </div>
-                             <div>
-                                 <label class="block mb-2">Session Timeout (minutes)</label>
-                                 <input type="number" name="sessionTimeout" class="w-full bg-gray-700 p-2 rounded" min="5" max="120">
-                             </div>
-                             <div>
-                                 <label class="block mb-2">
-                                     <input type="checkbox" name="ipWhitelist" class="mr-2">
-                                     Enable IP Whitelisting
-                                 </label>
-                             </div>
-                             <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Security Settings</button>
-                         </form>
-                     </div>
-                 </div>
-                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                     <div class="bg-gray-800 p-6 rounded-lg">
-                         <h3 class="text-xl font-semibold mb-4">API Keys</h3>
-                         <div class="space-y-2">
-                             <div class="flex justify-between items-center">
-                                 <span>Production API Key</span>
-                                 <button class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Regenerate</button>
-                             </div>
-                             <div class="flex justify-between items-center">
-                                 <span>Development API Key</span>
-                                 <button class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Regenerate</button>
-                             </div>
-                         </div>
-                     </div>
-                     <div class="bg-gray-800 p-6 rounded-lg">
-                         <h3 class="text-xl font-semibold mb-4">Theme Settings</h3>
-                         <div class="space-y-2">
-                             <button class="w-full bg-gray-700 p-2 rounded text-left">Light Mode</button>
-                            <button class="w-full bg-blue-500 p-2 rounded text-left">Dark Mode (Current)</button>
-             <button class="w-full bg-gray-700 p-2 rounded text-left">System Default</button>
-         </div>
-     </div>
- </div>
+            initAlertCharts();
+            document.getElementById('alertForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Alert preferences saved! Integration with notification services would be implemented here.');
+            });
+            break;
+        case 'settings':
+            content.innerHTML = `
+            <h2 class="text-2xl font-semibold mb-6">Settings</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">Notification Preferences</h3>
+                    <form id="notificationForm" class="space-y-4">
+                        <div>
+                            <label class="block mb-2">
+                                <input type="checkbox" name="emailNotif" class="mr-2">
+                                Email Notifications
+                            </label>
+                            <input type="email" placeholder="Enter your email" class="w-full bg-gray-700 p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block mb-2">
+                                <input type="checkbox" name="smsNotif" class="mr-2">
+                                SMS Notifications
+                            </label>
+                            <input type="tel" placeholder="Enter your phone number" class="w-full bg-gray-700 p-2 rounded">
+                        </div>
+                        <div>
+                            <label class="block mb-2">
+                                <input type="checkbox" name="pushNotif" class="mr-2">
+                                Push Notifications
+                            </label>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Preferences</button>
+                    </form>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">Security Settings</h3>
+                    <form id="securityForm" class="space-y-4">
+                        <div>
+                            <label class="block mb-2">Two-Factor Authentication</label>
+                            <select name="twoFactor" class="w-full bg-gray-700 p-2 rounded">
+                                <option value="disabled">Disabled</option>
+                                <option value="sms">SMS</option>
+                                <option value="app">Authenticator App</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block mb-2">Session Timeout (minutes)</label>
+                            <input type="number" name="sessionTimeout" class="w-full bg-gray-700 p-2 rounded" min="5" max="120">
+                        </div>
+                        <div>
+                            <label class="block mb-2">
+                                <input type="checkbox" name="ipWhitelist" class="mr-2">
+                                Enable IP Whitelisting
+                            </label>
+                        </div>
+                        <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Save Security Settings</button>
+                    </form>
+                </div>
+            </div>
+            <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">API Keys</h3>
+                    <div class="space-y-2">
+                        <div class="flex justify-between items-center">
+                            <span>Production API Key</span>
+                            <button class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Regenerate</button>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span>Development API Key</span>
+                            <button class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Regenerate</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-800 p-6 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-4">Theme Settings</h3>
+                    <div class="space-y-2">
+                        <button class="w-full bg-gray-700 p-2 rounded text-left">Light Mode</button>
+                       <button class="w-full bg-blue-500 p-2 rounded text-left">Dark Mode (Current)</button>
+        <button class="w-full bg-gray-700 p-2 rounded text-left">System Default</button>
+    </div>
+</div>
+</div>
 `;
-document.getElementById('notificationForm').addEventListener('submit', function(e) {
- e.preventDefault();
- alert('Notification preferences saved!');
+            document.getElementById('notificationForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Notification preferences saved!');
+            });
+            document.getElementById('securityForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                alert('Security settings updated!');
+            });
+            break;
+    }
+}
+
+// Modify the initCharts function
+function initCharts() {
+    const chartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                position: 'bottom',
+                labels: {
+                    color: 'white'
+                }
+            },
+            title: {
+                display: true,
+                color: 'white'
+            }
+        },
+        scales: {
+            x: {
+                ticks: { color: 'white' }
+            },
+            y: {
+                ticks: { color: 'white' }
+            }
+        }
+    };
+
+    // ... (other charts remain the same)
+
+    new Chart(document.getElementById('vulnChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                data: [4, 8, 15, 25],
+                backgroundColor: ['#DC2626', '#F59E0B', '#10B981', '#3B82F6']
+            }]
+        },
+        options: {
+            ...chartOptions,
+            plugins: {
+                ...chartOptions.plugins,
+                title: {
+                    ...chartOptions.plugins.title,
+                    text: 'Vulnerability Severity Distribution'
+                }
+            },
+            aspectRatio: 1 // Adjust this value to control the size
+        }
+    });
+
+    new Chart(document.getElementById('vendorChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Microsoft', 'Cisco', 'Oracle', 'IBM', 'VMware', 'Others'],
+            datasets: [{
+                label: '# of Products',
+                data: [35, 28, 22, 18, 15, 12],
+                backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#6B7280']
+            }]
+        },
+        options: {
+            ...chartOptions,
+            plugins: {
+                ...chartOptions.plugins,
+                legend: {
+                    display: false
+                },
+                title: {
+                    ...chartOptions.plugins.title,
+                    text: 'Product Distribution by Vendor'
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('performanceChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+            datasets: [{
+                label: 'CPU Usage',
+                data: [65, 59, 80, 81, 56, 55, 40, 60, 55, 30],
+                borderColor: '#3B82F6',
+                tension: 0.1
+            }, {
+                label: 'Memory Usage',
+                data: [28, 48, 40, 19, 86, 27, 90, 60, 30, 40],
+                borderColor: '#10B981',
+                tension: 0.1
+            }]
+        },
+        options: {
+            ...chartOptions,
+            plugins: {
+                ...chartOptions.plugins,
+                title: {
+                    ...chartOptions.plugins.title,
+                    text: 'System Performance'
+                }
+            }
+        }
+    });
+}
+
+function initVulnerabilityCharts() {
+    new Chart(document.getElementById('trendChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Vulnerabilities Detected',
+                data: [12, 19, 3, 5, 2, 3],
+                borderColor: '#3B82F6',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Vulnerability Trend (Last 6 Months)'
+                }
+            }
+        }
+    });
+    new Chart(document.getElementById('vulnAgeChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: ['0-30 days', '31-60 days', '61-90 days', '90+ days'],
+            datasets: [{
+                data: [30, 25, 20, 25],
+                backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#DC2626']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Vulnerability Age Distribution'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            aspectRatio: 1 // Adjust this value to control the size
+        }
+    });
+}
+
+function initVendorCharts() {
+    new Chart(document.getElementById('categoryChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: ['Operating Systems', 'Networking', 'Databases', 'Security', 'Others'],
+            datasets: [{
+                data: [30, 25, 20, 15, 10],
+                backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#6B7280']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Product Categories'
+                }
+            },
+            aspectRatio: 1 // Adjust this value to control the size
+        }
+    });
+
+    new Chart(document.getElementById('lifecycleChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['New', 'Mature', 'End of Life'],
+            datasets: [{
+                label: 'Number of Products',
+                data: [15, 45, 10],
+                backgroundColor: ['#10B981', '#3B82F6', '#DC2626']
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: false
+                },
+                title: {
+                    display: true,
+                    text: 'Product Lifecycle Status'
+                }
+            },
+            aspectRatio: 1.5 // Adjust this value to control the size
+        }
+    });
+}
+
+function initSolutionCharts() {
+    new Chart(document.getElementById('solutionEffectivenessChart').getContext('2d'), {
+        type: 'radar',
+        data: {
+            labels: ['SQL Injection', 'XSS', 'CSRF', 'Outdated SSL/TLS', 'Weak Passwords'],
+            datasets: [{
+                label: 'Before',
+                data: [65, 59, 90, 81, 56],
+                fill: true,
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgb(255, 99, 132)',
+                pointBackgroundColor: 'rgb(255, 99, 132)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(255, 99, 132)'
+            }, {
+                label: 'After',
+                data: [28, 48, 40, 19, 96],
+                fill: true,
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgb(54, 162, 235)',
+                pointBackgroundColor: 'rgb(54, 162, 235)',
+                pointBorderColor: '#fff',
+                pointHoverBackgroundColor: '#fff',
+                pointHoverBorderColor: 'rgb(54, 162, 235)'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Solution Effectiveness'
+                },
+                legend: {
+                    position: 'bottom'
+                }
+            },
+            aspectRatio: 1 // Adjust this value to control the size
+        }
+    });
+}
+
+function initAlertCharts() {
+    new Chart(document.getElementById('alertHistoryChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Critical',
+                data: [12, 19, 3, 5, 2, 3],
+                backgroundColor: '#DC2626'
+            }, {
+                label: 'Warning',
+                data: [15, 29, 5, 5, 20, 3],
+                backgroundColor: '#F59E0B'
+            }, {
+                label: 'Info',
+                data: [20, 35, 40, 39, 50, 30],
+                backgroundColor: '#3B82F6'
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Alert History (Last 6 Months)'
+                }
+            },
+            scales: {
+                x: {
+                    stacked: true,
+                },
+                y: {
+                    stacked: true
+                }
+            }
+        }
+    });
+
+    new Chart(document.getElementById('responseTimeChart').getContext('2d'), {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+            datasets: [{
+                label: 'Average Response Time (minutes)',
+                data: [30, 25, 20, 15, 10, 5],
+                borderColor: '#10B981',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Alert Response Time Trend'
+                }
+            }
+        }
+    });
+}
+
+// 3D Scene
+function init3DScene() {
+    const container = document.getElementById('3d-container');
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer();
+    renderer.setSize(container.clientWidth, container.clientHeight);
+    container.appendChild(renderer.domElement);
+
+    // Create a group to hold all objects
+    const group = new THREE.Group();
+    scene.add(group);
+
+    // Create multiple interconnected spheres representing network nodes
+    const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
+    const sphereMaterial = new THREE.MeshBasicMaterial({color: 0x3B82F6});
+
+    const positions = [
+        [-2, 0, 0], [2, 0, 0], [0, 2, 0], [0, -2, 0], [0, 0, 2], [0, 0, -2],
+        [-1, 1, 1], [1, -1, -1], [-1, -1, 1], [1, 1, -1]
+    ];
+
+    const spheres = positions.map(pos => {
+        const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
+        sphere.position.set(...pos);
+        group.add(sphere);
+        return sphere;
+    });
+
+    // Create lines connecting the spheres
+    const lineMaterial = new THREE.LineBasicMaterial({ color: 0x4B5563 });
+    for (let i = 0; i < spheres.length; i++) {
+        for (let j = i + 1; j < spheres.length; j++) {
+            const geometry = new THREE.BufferGeometry().setFromPoints([
+                spheres[i].position,
+                spheres[j].position
+            ]);
+            const line = new THREE.Line(geometry, lineMaterial);
+            group.add(line);
+        }
+    }
+
+    camera.position.z = 8;
+
+    // Animation
+    function animate() {
+        requestAnimationFrame(animate);
+        group.rotation.x += 0.001;
+        group.rotation.y += 0.002;
+        renderer.render(scene, camera);
+    }
+    animate();
+
+    // Resize handler
+    window.addEventListener('resize', () => {
+        camera.aspect = container.clientWidth / container.clientHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(container.clientWidth, container.clientHeight);
+    });
+}
+// Initialize the dashboard on page load
+document.addEventListener('DOMContentLoaded', () => {
+    changePage('dashboard');
 });
-document.getElementById('securityForm').addEventListener('submit', function(e) {
- e.preventDefault();
- alert('Security settings updated!');
-});
-break;
-     }
- }
-
- // Modify the initCharts function
- function initCharts() {
-     const chartOptions = {
-         responsive: true,
-         maintainAspectRatio: false,
-         plugins: {
-             legend: {
-                 position: 'bottom',
-                 labels: {
-                     color: 'white'
-                 }
-             },
-             title: {
-                 display: true,
-                 color: 'white'
-             }
-         },
-         scales: {
-             x: {
-                 ticks: { color: 'white' }
-             },
-             y: {
-                 ticks: { color: 'white' }
-             }
-         }
-     };
-
-     new Chart(document.getElementById('vulnChart').getContext('2d'), {
-         type: 'doughnut',
-         data: {
-             labels: ['Critical', 'High', 'Medium', 'Low'],
-             datasets: [{
-                 data: [4, 8, 15, 25],
-                 backgroundColor: ['#DC2626', '#F59E0B', '#10B981', '#3B82F6']
-             }]
-         },
-         options: {
-             ...chartOptions,
-             plugins: {
-                 ...chartOptions.plugins,
-                 title: {
-                     ...chartOptions.plugins.title,
-                     text: 'Vulnerability Severity Distribution'
-                 }
-             }
-         }
-     });
-
-     new Chart(document.getElementById('vendorChart').getContext('2d'), {
-         type: 'bar',
-         data: {
-             labels: ['Microsoft', 'Cisco', 'Oracle', 'IBM', 'VMware', 'Others'],
-             datasets: [{
-                 label: '# of Products',
-                 data: [35, 28, 22, 18, 15, 12],
-                 backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899', '#6B7280']
-             }]
-         },
-         options: {
-             ...chartOptions,
-             plugins: {
-                 ...chartOptions.plugins,
-                 legend: {
-                     display: false
-                 },
-                 title: {
-                     ...chartOptions.plugins.title,
-                     text: 'Product Distribution by Vendor'
-                 }
-             }
-         }
-     });
-
-     new Chart(document.getElementById('performanceChart').getContext('2d'), {
-         type: 'line',
-         data: {
-             labels: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
-             datasets: [{
-                 label: 'CPU Usage',
-                 data: [65, 59, 80, 81, 56, 55, 40, 60, 55, 30],
-                 borderColor: '#3B82F6',
-                 tension: 0.1
-             }, {
-                 label: 'Memory Usage',
-                 data: [28, 48, 40, 19, 86, 27, 90, 60, 30, 40],
-                 borderColor: '#10B981',
-                 tension: 0.1
-             }]
-         },
-         options: {
-             ...chartOptions,
-             plugins: {
-                 ...chartOptions.plugins,
-                 title: {
-                     ...chartOptions.plugins.title,
-                     text: 'System Performance'
-                 }
-             }
-         }
-     });
- }
-
- function initVulnerabilityCharts() {
-     new Chart(document.getElementById('trendChart').getContext('2d'), {
-         type: 'line',
-         data: {
-             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-             datasets: [{
-                 label: 'Vulnerabilities Detected',
-                 data: [12, 19, 3, 5, 2, 3],
-                 borderColor: '#3B82F6',
-                 tension: 0.1
-             }]
-         },
-         options: {
-             responsive: true,
-             plugins: {
-                 title: {
-                     display: true,
-                     text: 'Vulnerability Trend (Last 6 Months)'
-                 }
-             }
-         }
-     });
-
-     new Chart(document.getElementById('vulnAgeChart').getContext('2d'), {
-         type: 'pie',
-         data: {
-             labels: ['0-30 days', '31-60 days', '61-90 days', '90+ days'],
-             datasets: [{
-                 data: [30, 25, 20, 25],
-                 backgroundColor: ['#10B981', '#3B82F6', '#F59E0B', '#DC2626']
-             }]
-         },
-         options: {
-             responsive: true,
-             plugins: {
-                 title: {
-                     display: true,
-                     text: 'Vulnerability Age Distribution'
-                 }
-             }
-         }
-     });
- }
-
- function initVendorCharts() {
-     new Chart(document.getElementById('categoryChart').getContext('2d'), {
-         type: 'pie',
-         data: {
-             labels: ['Operating Systems', 'Networking', 'Databases', 'Security', 'Others'],
-             datasets: [{
-                 data: [30, 25, 20, 15, 10],
-                 backgroundColor: ['#3B82F6', '#10B981', '#F59E0B', '#8B5CF6', '#6B7280']
-             }]
-         },
-         options: {
-             responsive: true,
-             plugins: {
-                 legend: {
-                     position: 'bottom',
-                 },
-                 title: {
-                     display: true,
-                     text: 'Product Categories'
-                 }
-             }
-         }
-     });
-
-     new Chart(document.getElementById('lifecycleChart').getContext('2d'), {
-         type: 'bar',
-         data: {
-             labels: ['New', 'Mature', 'End of Life'],
-             datasets: [{
-                 label: 'Number of Products',
-                 data: [15, 45, 10],
-                 backgroundColor: ['#10B981', '#3B82F6', '#DC2626']
-             }]
-         },
-         options: {
-             responsive: true,
-             plugins: {
-                 legend: {
-                     display: false
-                 },
-                 title: {
-                     display: true,
-                     text: 'Product Lifecycle Status'
-                 }
-             }
-         }
-     });
- }
-
- function initSolutionCharts() {
-     new Chart(document.getElementById('solutionEffectivenessChart').getContext('2d'), {
-         type: 'radar',
-         data: {
-             labels: ['SQL Injection', 'XSS', 'CSRF', 'Outdated SSL/TLS', 'Weak Passwords'],
-             datasets: [{
-                 label: 'Before',
-                 data: [65, 59, 90, 81, 56],
-                 fill: true,
-                 backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                 borderColor: 'rgb(255, 99, 132)',
-                 pointBackgroundColor: 'rgb(255, 99, 132)',
-                 pointBorderColor: '#fff',
-                 pointHoverBackgroundColor: '#fff',
-                 pointHoverBorderColor: 'rgb(255, 99, 132)'
-             }, {
-                 label: 'After',
-                 data: [28, 48, 40, 19, 96],
-                 fill: true,
-                 backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                 borderColor: 'rgb(54, 162, 235)',
-                 pointBackgroundColor: 'rgb(54, 162, 235)',
-                 pointBorderColor: '#fff',
-                 pointHoverBackgroundColor: '#fff',
-                 pointHoverBorderColor: 'rgb(54, 162, 235)'
-             }]
-         },
-         options: {
-             responsive: true,
-             plugins: {
-                 title: {
-                     display: true,
-                     text: 'Solution Effectiveness'
-                 }
-             }
-         }
-     });
- }
-
- function initAlertCharts() {
-     new Chart(document.getElementById('alertHistoryChart').getContext('2d'), {
-         type: 'bar',
-         data: {
-             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-             datasets: [{
-                 label: 'Critical',
-                 data: [12, 19, 3, 5, 2, 3],
-                 backgroundColor: '#DC2626'
-             }, {
-                 label: 'Warning',
-                 data: [15, 29, 5, 5, 20, 3],
-                 backgroundColor: '#F59E0B'
-             }, {
-                 label: 'Info',
-                 data: [20, 35, 40, 39, 50, 30],
-                 backgroundColor: '#3B82F6'
-             }]
-         },
-         options: {
-             responsive: true,
-             plugins: {
-                 title: {
-                     display: true,
-                     text: 'Alert History (Last 6 Months)'
-                 }
-             },
-             scales: {
-                 x: {
-                     stacked: true,
-                 },
-                 y: {
-                     stacked: true
-                 }
-             }
-         }
-     });
-
-     new Chart(document.getElementById('responseTimeChart').getContext('2d'), {
-         type: 'line',
-         data: {
-             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-             datasets: [{
-                 label: 'Average Response Time (minutes)',
-                 data: [30, 25, 20, 15, 10, 5],
-                 borderColor: '#10B981',
-                 tension: 0.1
-             }]
-         },
-         options: {
-             responsive: true,
-             plugins: {
-                 title: {
-                     display: true,
-                     text: 'Alert Response Time Trend'
-                 }
-             }
-         }
-     });
- }
-
- // 3D Scene
- function init3DScene() {
-     const container = document.getElementById('3d-container');
-     const scene = new THREE.Scene();
-     const camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
-     const renderer = new THREE.WebGLRenderer();
-     renderer.setSize(container.clientWidth, container.clientHeight);
-     container.appendChild(renderer.domElement);
-
-     // Create a group to hold all objects
-     const group = new THREE.Group();
-     scene.add(group);
-
-     // Create multiple interconnected spheres representing network nodes
-     const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-     const sphereMaterial = new THREE.MeshBasicMaterial({color: 0x3B82F6});
-
-     const positions = [
-         [-2, 0, 0], [2, 0, 0], [0, 2, 0], [0, -2, 0], [0, 0, 2], [0, 0, -2],
-         [-1, 1, 1], [1, -1, -1], [-1, -1, 1], [1, 1, -1]
-     ];
-
-     const spheres = positions.map(pos => {
-         const sphere = new THREE.Mesh(sphereGeometry, sphereMaterial);
-         sphere.position.set(...pos);
-         group.add(sphere);
-         return sphere;
-     });
-
-     // Create lines connecting the spheres
-     const lineMaterial = new THREE.LineBasicMaterial({ color: 0x4B5563 });
-     for (let i = 0; i < spheres.length; i++) {
-         for (let j = i + 1; j < spheres.length; j++) {
-             const geometry = new THREE.BufferGeometry().setFromPoints([
-                 spheres[i].position,
-                 spheres[j].position
-             ]);
-             const line = new THREE.Line(geometry, lineMaterial);
-             group.add(line);
-         }
-     }
-
-     camera.position.z = 8;
-
-     // Animation
-     function animate() {
-         requestAnimationFrame(animate);
-         group.rotation.x += 0.001;
-         group.rotation.y += 0.002;
-         renderer.render(scene, camera);
-     }
-     animate();
-
-     // Resize handler
-     window.addEventListener('resize', () => {
-         camera.aspect = container.clientWidth / container.clientHeight;
-         camera.updateProjectionMatrix();
-         renderer.setSize(container.clientWidth, container.clientHeight);
-     });
- }
- // Initialize the dashboard on page load
-     changePage('dashboard');
- 
 
 // Add hover effects to navbar buttons
 const navButtons = document.querySelectorAll('nav button');
