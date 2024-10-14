@@ -5,24 +5,52 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HAWK - Enhanced OEM Dashboard</title>
     <link rel="icon" href="assests/Hawk.png" type="image/x-icon">
-
     <link rel="stylesheet" href="css/styles.css">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.7.0/chart.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet">
+    <style>
+        @media (max-width: 768px) {
+            .sidebar {
+                position: fixed;
+                left: -100%;
+                top: 0;
+                bottom: 0;
+                transition: 0.3s;
+                z-index: 1000;
+            }
+            .sidebar.open {
+                left: 0;
+            }
+            .hamburger {
+                display: block;
+            }
+            .close-btn {
+                display: block;
+            }
+        }
+        @media (min-width: 769px) {
+            .hamburger, .close-btn {
+                display: none;
+            }
+        }
+    </style>
 </head>
 <body class="bg-gray-900 text-white">
     <div id="loader"></div>
     <div id="main-content" class="hidden">
         <div class="flex h-screen">
             <!-- Sidebar -->
-            <nav class="w-64 bg-gray-800 p-4">
-                <div class="flex items-center mb-8">
-                    <div class="w-12 h-12 p-1">
-                        <img src="assests/Hawk.png" alt="Hawl logo image" class="rounded-full mr-4">
+            <nav class="sidebar w-64 bg-gray-800 p-4">
+                <div class="flex items-center justify-between mb-8">
+                    <div class="flex items-center">
+                        <div class="w-12 h-12 p-1">
+                            <img src="assests/Hawk.png" alt="Hawk logo image" class="rounded-full mr-4">
+                        </div>
+                        <h1 class="text-2xl font-bold">HAWK</h1>
                     </div>
-                    <h1 class="text-2xl font-bold">HAWK</h1>
+                    <button class="close-btn text-white text-xl">&times;</button>
                 </div>
                 <ul>
                     <li><button class="w-full text-left py-2 px-4 rounded mb-2 active-nav" onclick="changePage('dashboard')"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</button></li>
@@ -39,8 +67,9 @@
                 <!-- Header -->
                 <header class="bg-gray-800 p-4 flex justify-between items-center">
                     <div class="flex items-center">
+                        <button class="hamburger mr-4 text-xl">&#9776;</button>
                         <input type="text" placeholder="Search Here" class="bg-gray-700 px-4 py-2 rounded-lg mr-4">
-                        <span>OEM Server 1</span>
+                        <span class="hidden sm:inline">OEM Server 1</span>
                     </div>
                     <div class="flex items-center">
                         <button class="mr-4"><i class="fas fa-bell"></i></button>
@@ -58,6 +87,37 @@
         </div>
     </div>
     <script src="script.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const hamburger = document.querySelector('.hamburger');
+            const closeBtn = document.querySelector('.close-btn');
+            const sidebar = document.querySelector('.sidebar');
 
+            hamburger.addEventListener('click', function() {
+                sidebar.classList.add('open');
+            });
+
+            closeBtn.addEventListener('click', function() {
+                sidebar.classList.remove('open');
+            });
+
+            // Close sidebar when clicking outside of it
+            document.addEventListener('click', function(event) {
+                if (!sidebar.contains(event.target) && !hamburger.contains(event.target)) {
+                    sidebar.classList.remove('open');
+                }
+            });
+
+            // Close sidebar when a menu item is clicked (for mobile)
+            const menuItems = sidebar.querySelectorAll('button');
+            menuItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    if (window.innerWidth <= 768) {
+                        sidebar.classList.remove('open');
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>
