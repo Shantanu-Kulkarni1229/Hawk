@@ -174,8 +174,43 @@ function getDeviceInfo() {
         cookiesEnabled: navigator.cookieEnabled ? "Yes" : "No",
         batteryStatus: "Checking...",
         networkType: "Checking...",
-        status: "Secured" // You might want to implement actual security checks here
+        status: "Secured"
     };
+}
+
+function updateDynamicInfo() {
+    // Update battery status
+    if ('getBattery' in navigator) {
+        navigator.getBattery().then(function(battery) {
+            function updateBatteryStatus() {
+                const batteryStatus = `${Math.round(battery.level * 100)}% - ${battery.charging ? 'Charging' : 'Not charging'}`;
+                document.getElementById('batteryStatus').textContent = batteryStatus;
+            }
+            updateBatteryStatus();
+            battery.addEventListener('levelchange', updateBatteryStatus);
+            battery.addEventListener('chargingchange', updateBatteryStatus);
+        });
+    } else {
+        document.getElementById('batteryStatus').textContent = 'Not available';
+    }
+
+    // Update network type
+    function updateNetworkStatus() {
+        const connection = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+        if (connection) {
+            document.getElementById('networkType').textContent = connection.effectiveType || connection.type || 'Unknown';
+        } else {
+            document.getElementById('networkType').textContent = 'Not available';
+        }
+    }
+    updateNetworkStatus();
+    if ('connection' in navigator) {
+        navigator.connection.addEventListener('change', updateNetworkStatus);
+    }
+
+    // Update browser information
+    const browserInfo = `${getDeviceInfo().browser} ${getDeviceInfo().browserVersion}`;
+    document.getElementById('browserInfo').textContent = browserInfo;
 }
 function changePage(page) {
     showLoading();
@@ -189,10 +224,10 @@ function changePage(page) {
             case 'dashboard':
                 const deviceInfo = getDeviceInfo();
                 content.innerHTML = `
-               <h2 class="dashboard-title">OEM Dashboard</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <h2 class="dashboard-title">OEM Dashboard</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Device Health -->
-                    <div class="device-health p-6">
+                    <div class="device-health p-6 lg:col-span-1">
                         <h3 class="text-xl font-semibold mb-4">Device Health</h3>
                         <div class="info-item">
                             <span class="info-label">Device:</span>
@@ -255,9 +290,9 @@ function changePage(page) {
                         <p class="mt-4 text-center text-green-500 font-semibold">THIS DEVICE IS AUTOMATICALLY VERIFIED & SECURED</p>
                     </div>
                     <!-- Vulnerability Overview -->
-                    <div class="bg-gray-800 p-6 rounded-lg">
+                    <div class="bg-gray-800 p-6 rounded-lg lg:col-span-2">
                         <h3 class="text-xl font-semibold mb-4">Vulnerability Overview</h3>
-                        <div class="chart-container">
+                        <div class="chart-container" style="height: 300px;">
                             <canvas id="vulnChart"></canvas>
                         </div>
                     </div>
@@ -686,7 +721,7 @@ function initCharts() {
                     text: 'Vulnerability Severity Distribution'
                 }
             },
-            aspectRatio: 1 // Adjust this value to control the size
+            aspectRatio: 2 // Adjust this value to control the size
         }
     });
 
