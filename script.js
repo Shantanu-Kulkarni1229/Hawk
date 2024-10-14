@@ -1,3 +1,93 @@
+const styles = `
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap');
+    
+    body, html {
+        font-family: 'Roboto', sans-serif;
+    }
+    
+    .dashboard-title {
+        font-size: 2.5rem;
+        font-weight: 700;
+        color: #60A5FA;
+        margin-bottom: 1.5rem;
+        text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .device-health {
+        background: linear-gradient(145deg, #2C3E50, #34495E);
+        border-radius: 15px;
+        box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        overflow: hidden;
+    }
+    
+    .device-health h3 {
+        background-color: #3498DB;
+        color: white;
+        padding: 1rem;
+        margin: -1.5rem -1.5rem 1rem -1.5rem;
+        font-weight: 500;
+    }
+    
+    .info-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+        background-color: rgba(255,255,255,0.1);
+        border-radius: 5px;
+    }
+    
+    .info-label {
+        font-weight: 500;
+        color: #BDC3C7;
+    }
+    
+    .info-value {
+        font-weight: 400;
+        color: #ECF0F1;
+    }
+    
+    .status-secure {
+        background-color: #2ECC71;
+        color: white;
+        padding: 0.25rem 0.5rem;
+        border-radius: 15px;
+        font-weight: 500;
+    }
+    
+    .scan-results {
+        background-color: rgba(52, 73, 94, 0.7);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-top: 1rem;
+    }
+    
+    .scan-results h4 {
+        color: #3498DB;
+        margin-bottom: 0.5rem;
+    }
+    
+    .scan-results ul {
+        list-style-type: none;
+        padding-left: 0;
+    }
+    
+    .scan-results li {
+        margin-bottom: 0.25rem;
+        display: flex;
+        align-items: center;
+    }
+    
+    .scan-results li::before {
+        content: "•";
+        color: #3498DB;
+        font-weight: bold;
+        display: inline-block;
+        width: 1em;
+        margin-left: -1em;
+    }
+`;
 // Loader script
 const loader = document.getElementById('loader');
 const mainContent = document.getElementById('main-content');
@@ -33,7 +123,60 @@ function createLoader() {
 }
 
 createLoader();
-
+const styleSheet = document.createElement("style");
+styleSheet.type = "text/css";
+styleSheet.innerText = styles;
+document.head.appendChild(styleSheet);
+function getDeviceInfo() {
+    const ua = navigator.userAgent;
+    const platform = navigator.platform;
+    const vendor = navigator.vendor;
+    
+    return {
+        deviceName: platform || "Unknown Device",
+        os: (function() {
+            if (ua.indexOf("Win") != -1) return "Windows";
+            if (ua.indexOf("Mac") != -1) return "MacOS";
+            if (ua.indexOf("Linux") != -1) return "Linux";
+            if (ua.indexOf("Android") != -1) return "Android";
+            if (ua.indexOf("like Mac") != -1) return "iOS";
+            return "Unknown OS";
+        })(),
+        osVersion: (function() {
+            const matches = ua.match(/(Windows NT|Mac OS X|Android|iOS) ([\d._]+)/);
+            return matches ? matches[2].replace(/_/g, '.') : "Unknown";
+        })(),
+        browser: (function() {
+            if (ua.indexOf("Chrome") != -1) return "Chrome";
+            if (ua.indexOf("Safari") != -1) return "Safari";
+            if (ua.indexOf("Firefox") != -1) return "Firefox";
+            if (ua.indexOf("MSIE") != -1 || ua.indexOf("Trident/") != -1) return "Internet Explorer";
+            if (ua.indexOf("Edge") != -1) return "Edge";
+            if (ua.indexOf("Opera") != -1) return "Opera";
+            return "Unknown Browser";
+        })(),
+        browserVersion: (function() {
+            const matches = ua.match(/(Chrome|Safari|Firefox|MSIE|Edge|Opera)\/?\s*([\d.]+)/);
+            return matches ? matches[2] : "Unknown";
+        })(),
+        screen: `${window.screen.width}x${window.screen.height}`,
+        colorDepth: `${window.screen.colorDepth}-bit`,
+        ram: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown",
+        cpu: navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cores` : "Unknown",
+        gpu: (function() {
+            const canvas = document.createElement('canvas');
+            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+            if (!gl) return "Unknown";
+            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
+            return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Unknown";
+        })(),
+        touchScreen: 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? "Yes" : "No",
+        cookiesEnabled: navigator.cookieEnabled ? "Yes" : "No",
+        batteryStatus: "Checking...",
+        networkType: "Checking...",
+        status: "Secured" // You might want to implement actual security checks here
+    };
+}
 function changePage(page) {
     showLoading();
     setTimeout(() => {
@@ -42,29 +185,74 @@ function changePage(page) {
         navButtons.forEach(btn => btn.classList.remove('active-nav'));
         document.querySelector(`nav button[onclick="changePage('${page}')"]`).classList.add('active-nav');
 
-        // ... (rest of the changePage function remains the same)
-
         switch(page) {
             case 'dashboard':
+                const deviceInfo = getDeviceInfo();
                 content.innerHTML = `
-                
-                <h2 class="text-2xl font-semibold mb-6">Dashboard</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+               <h2 class="dashboard-title">OEM Dashboard</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
                     <!-- Device Health -->
-                    <div class="bg-gray-800 p-6 rounded-lg">
+                    <div class="device-health p-6">
                         <h3 class="text-xl font-semibold mb-4">Device Health</h3>
-                        <p class="mb-2">Device: Acer Extensa 215</p>
-                        <p class="mb-2">OS: Windows 11 Personal</p>
-                        <p class="mb-4">Status: <span class="text-green-500">Secured</span></p>
-                        <div class="bg-gray-700 p-4 rounded-lg">
+                        <div class="info-item">
+                            <span class="info-label">Device:</span>
+                            <span class="info-value">${deviceInfo.deviceName}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">OS:</span>
+                            <span class="info-value">${deviceInfo.os} ${deviceInfo.osVersion}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Browser:</span>
+                            <span class="info-value">${deviceInfo.browser} ${deviceInfo.browserVersion}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Screen:</span>
+                            <span class="info-value">${deviceInfo.screen} (${deviceInfo.colorDepth})</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">RAM:</span>
+                            <span class="info-value">${deviceInfo.ram}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">CPU:</span>
+                            <span class="info-value">${deviceInfo.cpu}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">GPU:</span>
+                            <span class="info-value">${deviceInfo.gpu}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Touch Screen:</span>
+                            <span class="info-value">${deviceInfo.touchScreen}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Cookies Enabled:</span>
+                            <span class="info-value">${deviceInfo.cookiesEnabled}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Battery Status:</span>
+                            <span class="info-value" id="batteryStatus">${deviceInfo.batteryStatus}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Network Type:</span>
+                            <span class="info-value" id="networkType">${deviceInfo.networkType}</span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status:</span>
+                            <span class="status-secure">${deviceInfo.status}</span>
+                        </div>
+                        <div class="scan-results">
                             <h4 class="font-semibold mb-2">Automatic Vulnerability Scan Results:</h4>
-                            <ul class="list-disc list-inside">
+                            <ul>
                                 <li>No critical vulnerabilities detected</li>
                                 <li>2 software updates recommended</li>
                                 <li>Firewall active and configured correctly</li>
+                                <li>Antivirus definitions up to date</li>
+                                <li>System integrity check passed</li>
                             </ul>
                         </div>
-                        <p class="mt-4 text-green-500 font-semibold">THIS DEVICE IS AUTOMATICALLY VERIFIED & SECURED</p>
+                        <p class="mt-4 text-center text-green-500 font-semibold">THIS DEVICE IS AUTOMATICALLY VERIFIED & SECURED</p>
                     </div>
                     <!-- Vulnerability Overview -->
                     <div class="bg-gray-800 p-6 rounded-lg">
@@ -74,7 +262,7 @@ function changePage(page) {
                         </div>
                     </div>
                 </div>
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Vendor Distribution -->
                     <div class="bg-gray-800 p-6 rounded-lg">
                         <h3 class="text-xl font-semibold mb-4">Vendor Distribution</h3>
@@ -106,11 +294,12 @@ function changePage(page) {
                         </div>
                     </div>
                 </div>
-            
-           `;
-                           initCharts();
+                `;
+                initCharts();
                 init3DScene();
+                updateDynamicInfo();
                 break;
+
             case 'vulnerabilities':
                 content.innerHTML = `
                 <h2 class="text-2xl font-semibold mb-6">Vulnerabilities</h2>
