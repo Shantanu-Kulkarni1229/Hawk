@@ -295,21 +295,24 @@ function changePage(page) {
                         <div class="chart-container" style="height: 300px;">
                             <canvas id="vulnChart"></canvas>
                         </div>
-                    </div>
-                </div>
-                  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Vendor Distribution -->
-                    <div class="bg-gray-800 p-6 rounded-lg">
+                         <div class="bg-gray-800 p-6 rounded-lg">
                         <h3 class="text-xl font-semibold mb-4">Vendor Distribution</h3>
                         <div class="chart-container">
                             <canvas id="vendorChart"></canvas>
                         </div>
-                    </div>
-                    <!-- 3D Network Topology -->
-                    <div class="bg-gray-800 p-6 rounded-lg">
+                        <div class="bg-gray-800 p-6 rounded-lg">
                         <h3 class="text-xl font-semibold mb-4">Network Topology</h3>
                         <div id="3d-container" class="w-full h-64"></div>
                     </div>
+                    </div>
+                    </div>
+                    
+                </div>
+                  <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Vendor Distribution -->
+                   
+                    <!-- 3D Network Topology -->
+                    
                 </div>
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Threat Intelligence Feed -->
