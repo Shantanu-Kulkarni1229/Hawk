@@ -131,15 +131,21 @@ function getDeviceInfo() {
     const ua = navigator.userAgent;
     const platform = navigator.platform;
     const vendor = navigator.vendor;
-    
+
     return {
-        deviceName: platform || "Unknown Device",
+        deviceName: (function() {
+            if (/Android/i.test(ua)) return "Android Device";
+            if (/iPhone|iPad|iPod/.test(platform)) return "iOS Device";
+            if (/Win/.test(platform)) return "Windows Device";
+            if (/Mac/.test(platform)) return "Mac Device";
+            return platform || "Unknown Device";
+        })(),
         os: (function() {
-            if (ua.indexOf("Win") != -1) return "Windows";
-            if (ua.indexOf("Mac") != -1) return "MacOS";
-            if (ua.indexOf("Linux") != -1) return "Linux";
-            if (ua.indexOf("Android") != -1) return "Android";
-            if (ua.indexOf("like Mac") != -1) return "iOS";
+            if (/Android/i.test(ua)) return "Android";
+            if (/Win/i.test(ua)) return "Windows";
+            if (/Mac/i.test(ua)) return "MacOS";
+            if (/Linux/i.test(ua)) return "Linux";
+            if (/like Mac/i.test(ua)) return "iOS";
             return "Unknown OS";
         })(),
         osVersion: (function() {
@@ -147,16 +153,16 @@ function getDeviceInfo() {
             return matches ? matches[2].replace(/_/g, '.') : "Unknown";
         })(),
         browser: (function() {
-            if (ua.indexOf("Chrome") != -1) return "Chrome";
-            if (ua.indexOf("Safari") != -1) return "Safari";
-            if (ua.indexOf("Firefox") != -1) return "Firefox";
-            if (ua.indexOf("MSIE") != -1 || ua.indexOf("Trident/") != -1) return "Internet Explorer";
-            if (ua.indexOf("Edge") != -1) return "Edge";
-            if (ua.indexOf("Opera") != -1) return "Opera";
+            if (/Chrome/.test(ua)) return "Chrome";
+            if (/Safari/.test(ua) && !/Chrome/.test(ua)) return "Safari";
+            if (/Firefox/.test(ua)) return "Firefox";
+            if (/MSIE|Trident\//.test(ua)) return "Internet Explorer";
+            if (/Edge/.test(ua)) return "Edge";
+            if (/Opera/.test(ua) || /OPR/.test(ua)) return "Opera";
             return "Unknown Browser";
         })(),
         browserVersion: (function() {
-            const matches = ua.match(/(Chrome|Safari|Firefox|MSIE|Edge|Opera)\/?\s*([\d.]+)/);
+            const matches = ua.match(/(Chrome|Safari|Firefox|MSIE|Edge|Opera|OPR)\/?\s*([\d.]+)/);
             return matches ? matches[2] : "Unknown";
         })(),
         screen: `${window.screen.width}x${window.screen.height}`,
@@ -177,6 +183,7 @@ function getDeviceInfo() {
         status: "Secured"
     };
 }
+
 
 function updateDynamicInfo() {
     // Update battery status
@@ -228,7 +235,7 @@ function changePage(page) {
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Device Health -->
                     <div class="device-health p-6 lg:col-span-1">
-                        <h3 class="text-xl font-semibold mb-4">Device Health</h3>
+                        <h3 class="text-xl font-semibold mb-4">Device Information & Health</h3>
                         <div class="info-item">
                             <span class="info-label">Device:</span>
                             <span class="info-value">${deviceInfo.deviceName}</span>
