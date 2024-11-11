@@ -130,7 +130,6 @@ document.head.appendChild(styleSheet);
 function getDeviceInfo() {
     const ua = navigator.userAgent;
     const platform = navigator.platform;
-    const vendor = navigator.vendor;
 
     return {
         deviceName: (function() {
@@ -153,17 +152,19 @@ function getDeviceInfo() {
             return matches ? matches[2].replace(/_/g, '.') : "Unknown";
         })(),
         browser: (function() {
-            if (/Chrome/.test(ua)) return "Chrome";
+            if (/Edg\//.test(ua)) return "Edge";
+            if (/OPR|Opera/.test(ua)) return "Opera";
+            if (/Chrome/.test(ua) && !/Edg\//.test(ua)) return "Chrome";
             if (/Safari/.test(ua) && !/Chrome/.test(ua)) return "Safari";
             if (/Firefox/.test(ua)) return "Firefox";
             if (/MSIE|Trident\//.test(ua)) return "Internet Explorer";
-            if (/Edge/.test(ua)) return "Edge";
-            if (/Opera/.test(ua) || /OPR/.test(ua)) return "Opera";
             return "Unknown Browser";
         })(),
         browserVersion: (function() {
-            const matches = ua.match(/(Chrome|Safari|Firefox|MSIE|Edge|Opera|OPR)\/?\s*([\d.]+)/);
-            return matches ? matches[2] : "Unknown";
+            const matches = ua.match(/(Edg|OPR|Opera|Chrome|Safari|Firefox|MSIE|Trident)\/?\s*([\d.]+)/);
+            if (matches) return matches[2];
+            const edgeMatch = ua.match(/Edg\/([\d.]+)/);
+            return edgeMatch ? edgeMatch[1] : "Unknown";
         })(),
         screen: `${window.screen.width}x${window.screen.height}`,
         colorDepth: `${window.screen.colorDepth}-bit`,
