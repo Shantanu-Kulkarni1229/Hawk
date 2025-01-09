@@ -129,14 +129,14 @@ styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
 const ctx = document.getElementById('severityChart').getContext('2d');
 new Chart(ctx, {
-  type: 'pie',
-  data: {
-    labels: ['High', 'Medium', 'Low'],
-    datasets: [{
-      data: [50, 30, 20],
-      backgroundColor: ['#ff0000', '#ffcc00', '#00cc00'],
-    }],
-  },
+    type: 'pie',
+    data: {
+        labels: ['High', 'Medium', 'Low'],
+        datasets: [{
+            data: [50, 30, 20],
+            backgroundColor: ['#ff0000', '#ffcc00', '#00cc00'],
+        }],
+    },
 });
 
 function getDeviceInfo() {
@@ -335,20 +335,29 @@ function changePage(page) {
 
 
                     <!-- Vulnerability Overview -->
-                    <div class="bg-gray-800 p-6 rounded-lg lg:col-span-2">
-                        <h3 class="text-xl font-semibold mb-4">Vulnerability Overview</h3>
-                        <div class="chart-container" style="height: 300px;">
-                            <canvas id="vulnChart"></canvas>
-                        </div>
-                         <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Vendor Distribution</h3>
+<div class="bg-gray-800 p-6 rounded-lg lg:col-span-2">
+    <h3 class="text-xl font-semibold mb-4">Vulnerability Overview</h3>
+    <div class="chart-container" style="height: 300px;">
+        <canvas id="vulnChart"></canvas>
+    </div>
+    <div class="bg-gray-800 p-6 rounded-lg">
+         <h3 class="text-xl font-semibold mb-4">Vendor Distribution</h3>
+        <div class="chart-container">
+            <canvas id="vendorChart"></canvas>
+        </div>
+
+    </div>
+    <div class="bg-gray-800 p-6 rounded-lg">
+                        <h3 class="text-xl font-semibold mb-4">System Performance</h3>
                         <div class="chart-container">
-                            <canvas id="vendorChart"></canvas>
+                            <canvas id="performanceChart"></canvas>
                         </div>
-                        <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Network Topology</h3>
-                        <div id="3d-container" class="w-full h-64"></div>
                     </div>
+</div>
+    
+</div>
+
+
                     </div>
                     </div>
                     
@@ -359,7 +368,7 @@ function changePage(page) {
                     <!-- 3D Network Topology -->
                     
                 </div>
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="mt-6  w-full">
                     <!-- Threat Intelligence Feed -->
 <div class="bg-gray-800 p-6 rounded-lg">
     <h3 class="text-xl font-semibold mb-4">Threat Intelligence Feed</h3>
@@ -414,12 +423,6 @@ function changePage(page) {
 </div>
 
                     <!-- System Performance -->
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">System Performance</h3>
-                        <div class="chart-container">
-                            <canvas id="performanceChart"></canvas>
-                        </div>
-                    </div>
                 </div>
                 `;
                 initCharts();
@@ -427,8 +430,8 @@ function changePage(page) {
                 updateDynamicInfo();
                 break;
 
-                case 'vulnerabilities':
-                    content.innerHTML = `
+            case 'vulnerabilities':
+                content.innerHTML = `
                     <h2 class="text-2xl font-semibold mb-6">Vulnerabilities</h2>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                         <!-- Recent Vulnerabilities -->
@@ -589,68 +592,180 @@ function changePage(page) {
 </div>
 
                     `;
-                    initVulnerabilityCharts();
-                    break;
-                                      case 'vendors':
+                initVulnerabilityCharts();
+                break;
+            case 'vendors':
                 content.innerHTML = `
-                <h2 class="text-2xl font-semibold mb-6">Vendors and Products</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Top Vendors</h3>
-                        <ul class="space-y-2">
-                            <li class="flex justify-between items-center">
-                                <span>Microsoft</span>
-                                <span class="text-blue-500">35 products</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span>Cisco</span>
-                                <span class="text-blue-500">28 products</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span>Oracle</span>
-                                <span class="text-blue-500">22 products</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span>IBM</span>
-                                <span class="text-blue-500">18 products</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span>VMware</span>
-                                <span class="text-blue-500">15 products</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Product Categories</h3>
-                        <div class="chart-container">
-                            <canvas id="categoryChart"></canvas>
+                    <h2 class="text-2xl font-semibold mb-6">Vendors and Products</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Top Vendors</h3>
+                           <ul class="space-y-2">
+    <li class="flex justify-between items-center">
+        <span>Microsoft</span>
+        <span class="text-blue-500">35 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Cisco</span>
+        <span class="text-blue-500">28 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Oracle</span>
+        <span class="text-blue-500">22 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>IBM</span>
+        <span class="text-blue-500">18 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>VMware</span>
+        <span class="text-blue-500">15 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Red Hat</span>
+        <span class="text-blue-500">12 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Amazon AWS</span>
+        <span class="text-blue-500">10 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Google Cloud</span>
+        <span class="text-blue-500">9 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Adobe</span>
+        <span class="text-blue-500">8 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Salesforce</span>
+        <span class="text-blue-500">7 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Hewlett Packard Enterprise</span>
+        <span class="text-blue-500">6 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Intel</span>
+        <span class="text-blue-500">5 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Zoom</span>
+        <span class="text-blue-500">4 products</span>
+    </li>
+</ul>
+
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Product Categories</h3>
+                            <div class="chart-container">
+                                <canvas id="categoryChart"></canvas>
+                            </div>
+                            <p class="mt-4 text-sm text-gray-400">Categories include Operating Systems, Databases, Networking Tools, Cloud Platforms, and Security Solutions.</p>
                         </div>
                     </div>
-                </div>
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Recent Product Updates</h3>
-                        <ul class="space-y-2">
-                            <li class="p-2 bg-gray-700 rounded">
-                                <span class="font-semibold">Windows Server 2019</span> - Security patch KB5005030
-                            </li>
-                            <li class="p-2 bg-gray-700 rounded">
-                                <span class="font-semibold">Cisco IOS XE</span> - Version 17.3.3 release
-                            </li>
-                            <li class="p-2 bg-gray-700 rounded">
-                                <span class="font-semibold">Oracle Database</span> - Critical patch update (CPU) July 2023
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Product Lifecycle Status</h3>
-                        <div class="chart-container">
-                            <canvas id="lifecycleChart"></canvas>
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Recent Product Updates</h3>
+                           <ul class="space-y-2">
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Windows Server 2019</span> - Security patch KB5005030
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Cisco IOS XE</span> - Version 17.3.3 release
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Oracle Database</span> - Critical patch update (CPU) July 2023
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Red Hat Enterprise Linux</span> - Kernel update 8.6.0
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">VMware vSphere</span> - Maintenance release 7.0.3
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Microsoft Azure</span> - Updated firewall rules for enhanced security
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Google Chrome</span> - Version 118.0.0 with security and performance improvements
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Adobe Acrobat</span> - Patch for PDF rendering vulnerability
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Ubuntu Linux</span> - LTS security update 22.04.2
+    </li>
+    <li class="p-2 bg-gray-700 rounded">
+        <span class="font-semibold">Apache Tomcat</span> - Version 10.1.0 addressing CVE-2023-1234
+    </li>
+</ul>
+
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Product Lifecycle Status</h3>
+                            <div class="chart-container">
+                                <canvas id="lifecycleChart"></canvas>
+                            </div>
+                            <p class="mt-4 text-sm text-gray-400">Track products in phases such as Active Support, Extended Support, and End of Life.</p>
                         </div>
                     </div>
-                </div>
-            `;
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Emerging Vendors</h3>
+                            <ul class="space-y-2">
+    <li class="flex justify-between items-center">
+        <span>Zoom</span>
+        <span class="text-blue-500">6 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Snowflake</span>
+        <span class="text-blue-500">4 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>HashiCorp</span>
+        <span class="text-blue-500">3 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>ServiceNow</span>
+        <span class="text-blue-500">8 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Atlassian</span>
+        <span class="text-blue-500">5 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Salesforce</span>
+        <span class="text-blue-500">7 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Splunk</span>
+        <span class="text-blue-500">4 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Datadog</span>
+        <span class="text-blue-500">3 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Palo Alto Networks</span>
+        <span class="text-blue-500">6 products</span>
+    </li>
+    <li class="flex justify-between items-center">
+        <span>Slack</span>
+        <span class="text-blue-500">3 products</span>
+    </li>
+</ul>
+
+                        </div>
+                        <div class="bg-gray-800 p-6 rounded-lg">
+            <h3 class="text-xl font-semibold mb-4">Key Performance Metrics</h3>
+            <div class="chart-container">
+                <canvas id="performanceChart"></canvas>
+            </div>
+        </div>
+                    </div>
+                    `;
                 initVendorCharts();
+                renderPerformanceChart();
                 break;
             case 'solutions':
                 content.innerHTML = `
@@ -1356,3 +1471,61 @@ changePage = (page) => {
         originalChangePage(page);
     }, 500);
 };
+function renderPerformanceChart() {
+    const ctx = document.getElementById('performanceChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Microsoft', 'Cisco', 'Oracle', 'IBM', 'VMware'],
+            datasets: [
+                {
+                    label: 'Product Reliability',
+                    data: [95, 90, 85, 88, 92],
+                    backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    borderWidth: 1,
+                },
+                {
+                    label: 'Update Frequency',
+                    data: [85, 80, 78, 75, 88],
+                    backgroundColor: 'rgba(153, 102, 255, 0.6)',
+                    borderColor: 'rgba(153, 102, 255, 1)',
+                    borderWidth: 1,
+                },
+                {
+                    label: 'Customer Support Satisfaction',
+                    data: [90, 88, 82, 85, 87],
+                    backgroundColor: 'rgba(255, 159, 64, 0.6)',
+                    borderColor: 'rgba(255, 159, 64, 1)',
+                    borderWidth: 1,
+                },
+            ],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    enabled: true,
+                },
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Vendors',
+                    },
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Score (out of 100)',
+                    },
+                },
+            },
+        },
+    });
+}
