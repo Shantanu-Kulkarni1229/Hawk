@@ -127,69 +127,73 @@ const styleSheet = document.createElement("style");
 styleSheet.type = "text/css";
 styleSheet.innerText = styles;
 document.head.appendChild(styleSheet);
-function getDeviceInfo() {
-    const ua = navigator.userAgent;
-    const platform = navigator.platform;
+const ctx = document.getElementById('severityChart').getContext('2d');
+new Chart(ctx, {
+  type: 'pie',
+  data: {
+    labels: ['High', 'Medium', 'Low'],
+    datasets: [{
+      data: [50, 30, 20],
+      backgroundColor: ['#ff0000', '#ffcc00', '#00cc00'],
+    }],
+  },
+});
 
-    return {
-        deviceName: (function() {
-            if (/Android/i.test(ua)) return "Android Device";
-            if (/iPhone|iPad|iPod/.test(platform)) return "iOS Device";
-            if (/Win/.test(platform)) return "Windows Device";
-            if (/Mac/.test(platform)) return "Mac Device";
-            return platform || "Unknown Device";
-        })(),
-        os: (function() {
-            if (/Android/i.test(ua)) return "Android";
-            if (/Win/i.test(ua)) return "Windows";
-            if (/Mac/i.test(ua)) return "MacOS";
-            if (/Linux/i.test(ua)) return "Linux";
-            if (/like Mac/i.test(ua)) return "iOS";
-            return "Unknown OS";
-        })(),
-        osVersion: (function() {
-            const matches = ua.match(/(Windows NT|Mac OS X|Android|iOS) ([\d._]+)/);
-            return matches ? matches[2].replace(/_/g, '.') : "Unknown";
-        })(),
-        browser: (function() {
-            if (/Edg\//.test(ua)) return "Edge";
-            if (/OPR|Opera/.test(ua)) return "Opera";
-            if (/Chrome/.test(ua) && !/Edg\//.test(ua)) return "Chrome";
-            if (/Safari/.test(ua) && !/Chrome/.test(ua)) return "Safari";
-            if (/Firefox/.test(ua)) return "Firefox";
-            if (/MSIE|Trident\//.test(ua)) return "Internet Explorer";
-            return "Unknown Browser";
-        })(),
-        browserVersion: (function() {
-            const matches = ua.match(/(Edg|OPR|Opera|Chrome|Safari|Firefox|MSIE|Trident)\/?\s*([\d.]+)/);
-            if (matches) return matches[2];
-            const edgeMatch = ua.match(/Edg\/([\d.]+)/);
-            return edgeMatch ? edgeMatch[1] : "Unknown";
-        })(),
-        screen: `${window.screen.width}x${window.screen.height}`,
-        colorDepth: `${window.screen.colorDepth}-bit`,
-        ram: navigator.deviceMemory ? `${navigator.deviceMemory} GB` : "Unknown",
+function getDeviceInfo() {
+    const deviceInfo = {
+        deviceName: navigator.platform,
+        os: navigator.userAgentData.platform || navigator.platform,
+        osVersion: "Unknown", // Optional: Parse userAgent for a detailed OS version
+        browser: navigator.userAgentData.brands[0].brand,
+        browserVersion: navigator.userAgentData.brands[0].version,
+        screen: `${screen.width}x${screen.height}`,
+        colorDepth: `${screen.colorDepth} bits`,
+        ram: navigator.deviceMemory || "Unknown",
         cpu: navigator.hardwareConcurrency ? `${navigator.hardwareConcurrency} cores` : "Unknown",
-        gpu: (function() {
-            const canvas = document.createElement('canvas');
-            const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-            if (!gl) return "Unknown";
-            const debugInfo = gl.getExtension('WEBGL_debug_renderer_info');
-            return debugInfo ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL) : "Unknown";
-        })(),
-        touchScreen: 'ontouchstart' in window || navigator.maxTouchPoints > 0 ? "Yes" : "No",
+        gpu: getGPUInfo(), // Custom function to fetch GPU info
+        touchScreen: "ontouchstart" in window || navigator.maxTouchPoints > 0 ? "Yes" : "No",
         cookiesEnabled: navigator.cookieEnabled ? "Yes" : "No",
-        batteryStatus: "Checking...",
-        networkType: "Checking...",
-        status: "Secured"
+        batteryStatus: "Loading...", // Updated dynamically below
+        networkType: "Loading...", // Updated dynamically below
+        status: "Secure", // Placeholder: update dynamically if needed
+        uptime: `${Math.floor(performance.now() / 1000 / 60)} minutes`, // Approximation
+        vpnConnected: "Checking...", // Placeholder for dynamic data
+        firewallEnabled: "Checking...", // Placeholder for dynamic data
+        timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
     };
+
+    // Add dynamic battery status
+    navigator.getBattery?.().then((battery) => {
+        const batteryLevel = `${Math.round(battery.level * 100)}%`;
+        deviceInfo.batteryStatus = battery.charging
+            ? `${batteryLevel} (Charging)`
+            : `${batteryLevel} (Not Charging)`;
+        updateBatteryInfo(battery); // Optional event listener for real-time updates
+    });
+
+    // Add dynamic network information
+    if (navigator.connection) {
+        deviceInfo.networkType = navigator.connection.effectiveType || "Unknown";
+    }
+
+    return deviceInfo;
+}
+
+function getGPUInfo() {
+    const canvas = document.createElement("canvas");
+    const gl = canvas.getContext("webgl");
+    if (!gl) return "Unavailable";
+    const debugInfo = gl.getExtension("WEBGL_debug_renderer_info");
+    return debugInfo
+        ? gl.getParameter(debugInfo.UNMASKED_RENDERER_WEBGL)
+        : "Unknown";
 }
 
 
 function updateDynamicInfo() {
     // Update battery status
     if ('getBattery' in navigator) {
-        navigator.getBattery().then(function(battery) {
+        navigator.getBattery().then(function (battery) {
             function updateBatteryStatus() {
                 const batteryStatus = `${Math.round(battery.level * 100)}% - ${battery.charging ? 'Charging' : 'Not charging'}`;
                 document.getElementById('batteryStatus').textContent = batteryStatus;
@@ -228,64 +232,95 @@ function changePage(page) {
         navButtons.forEach(btn => btn.classList.remove('active-nav'));
         document.querySelector(`nav button[onclick="changePage('${page}')"]`).classList.add('active-nav');
 
-        switch(page) {
+        switch (page) {
             case 'dashboard':
                 const deviceInfo = getDeviceInfo();
                 content.innerHTML = `
                 <h2 class="dashboard-title">OEM Dashboard</h2>
                 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <!-- Device Health -->
-                    <div class="device-health p-6 lg:col-span-1">
-                        <h3 class="text-xl font-semibold mb-4">Device Information & Health</h3>
-                        <div class="info-item">
-                            <span class="info-label">Device:</span>
-                            <span class="info-value">${deviceInfo.deviceName}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">OS:</span>
-                            <span class="info-value">${deviceInfo.os} ${deviceInfo.osVersion}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Browser:</span>
-                            <span class="info-value">${deviceInfo.browser} ${deviceInfo.browserVersion}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Screen:</span>
-                            <span class="info-value">${deviceInfo.screen} (${deviceInfo.colorDepth})</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">RAM:</span>
-                            <span class="info-value">${deviceInfo.ram}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">CPU:</span>
-                            <span class="info-value">${deviceInfo.cpu}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">GPU:</span>
-                            <span class="info-value">${deviceInfo.gpu}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Touch Screen:</span>
-                            <span class="info-value">${deviceInfo.touchScreen}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Cookies Enabled:</span>
-                            <span class="info-value">${deviceInfo.cookiesEnabled}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Battery Status:</span>
-                            <span class="info-value" id="batteryStatus">${deviceInfo.batteryStatus}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Network Type:</span>
-                            <span class="info-value" id="networkType">${deviceInfo.networkType}</span>
-                        </div>
-                        <div class="info-item">
-                            <span class="info-label">Status:</span>
-                            <span class="status-secure">${deviceInfo.status}</span>
-                        </div>
-                        <div class="scan-results">
+                   <div class="device-health p-6 lg:col-span-1">
+    <h3 class="text-xl font-semibold mb-4">Device Information & Health</h3>
+    <!-- Original Info Items -->
+    <div class="info-item">
+        <span class="info-label">Device:</span>
+        <span class="info-value">${deviceInfo.deviceName}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">OS:</span>
+        <span class="info-value">${deviceInfo.os} ${deviceInfo.osVersion}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Browser:</span>
+        <span class="info-value">${deviceInfo.browser} ${deviceInfo.browserVersion}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Screen:</span>
+        <span class="info-value">${deviceInfo.screen} (${deviceInfo.colorDepth})</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">RAM:</span>
+        <span class="info-value">${deviceInfo.ram}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">CPU:</span>
+        <span class="info-value">${deviceInfo.cpu}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">GPU:</span>
+        <span class="info-value">${deviceInfo.gpu}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Touch Screen:</span>
+        <span class="info-value">${deviceInfo.touchScreen}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Cookies Enabled:</span>
+        <span class="info-value">${deviceInfo.cookiesEnabled}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Battery Status:</span>
+        <span class="info-value" id="batteryStatus">${deviceInfo.batteryStatus}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Network Type:</span>
+        <span class="info-value" id="networkType">${deviceInfo.networkType}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Status:</span>
+        <span class="status-secure">${deviceInfo.status}</span>
+    </div>
+
+    <!-- Additional Info Items -->
+    <div class="info-item">
+        <span class="info-label">Disk Usage:</span>
+        <span class="info-value">${deviceInfo.diskUsage} (${deviceInfo.diskFreeSpace} free)</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Uptime:</span>
+        <span class="info-value">${deviceInfo.uptime}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">CPU Temperature:</span>
+        <span class="info-value">${deviceInfo.cpuTemperature}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">VPN Connected:</span>
+        <span class="info-value">${deviceInfo.vpnConnected ? 'Yes' : 'No'}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Firewall Enabled:</span>
+        <span class="info-value">${deviceInfo.firewallEnabled ? 'Yes' : 'No'}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Antivirus Status:</span>
+        <span class="info-value">${deviceInfo.antivirusStatus}</span>
+    </div>
+    <div class="info-item">
+        <span class="info-label">Current Timezone:</span>
+        <span class="info-value">${deviceInfo.timezone}</span>
+    </div>
+    <div class="scan-results">
                             <h4 class="font-semibold mb-2">Automatic Vulnerability Scan Results:</h4>
                             <ul>
                                 <li>No critical vulnerabilities detected</li>
@@ -296,7 +331,9 @@ function changePage(page) {
                             </ul>
                         </div>
                         <p class="mt-4 text-center text-green-500 font-semibold">THIS DEVICE IS AUTOMATICALLY VERIFIED & SECURED</p>
-                    </div>
+</div>
+
+
                     <!-- Vulnerability Overview -->
                     <div class="bg-gray-800 p-6 rounded-lg lg:col-span-2">
                         <h3 class="text-xl font-semibold mb-4">Vulnerability Overview</h3>
@@ -324,14 +361,58 @@ function changePage(page) {
                 </div>
                 <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
                     <!-- Threat Intelligence Feed -->
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Threat Intelligence Feed</h3>
-                        <ul class="space-y-2">
-                            <li class="flex items-center"><span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span> New ransomware variant detected in wild</li>
-                            <li class="flex items-center"><span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span> Potential zero-day vulnerability in popular CMS</li>
-                            <li class="flex items-center"><span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span> Latest security patches available for Windows OS</li>
-                        </ul>
-                    </div>
+<div class="bg-gray-800 p-6 rounded-lg">
+    <h3 class="text-xl font-semibold mb-4">Threat Intelligence Feed</h3>
+    <ul class="space-y-2">
+        <!-- Original Threat Alerts -->
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+            New ransomware variant detected in the wild
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+            Potential zero-day vulnerability in popular CMS
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+            Latest security patches available for Windows OS
+        </li>
+        <!-- New Threat Alerts -->
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+            Phishing campaign targeting financial institutions detected
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+            Unusual traffic patterns observed on corporate networks
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+            Successful mitigation of DDoS attack on e-commerce platform
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+            Weak encryption detected on legacy systems, update recommended
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+            Malware variant exploiting IoT devices spreads rapidly
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-green-500 rounded-full mr-2"></span>
+            All endpoints successfully updated to latest antivirus definitions
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-yellow-500 rounded-full mr-2"></span>
+            Suspicious login attempts detected from unknown IPs
+        </li>
+        <li class="flex items-center">
+            <span class="w-3 h-3 bg-red-500 rounded-full mr-2"></span>
+            Critical vulnerability in JavaScript library requires immediate patching
+        </li>
+    </ul>
+</div>
+
                     <!-- System Performance -->
                     <div class="bg-gray-800 p-6 rounded-lg">
                         <h3 class="text-xl font-semibold mb-4">System Performance</h3>
@@ -346,76 +427,171 @@ function changePage(page) {
                 updateDynamicInfo();
                 break;
 
-            case 'vulnerabilities':
-                content.innerHTML = `
-                <h2 class="text-2xl font-semibold mb-6">Vulnerabilities</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Recent Vulnerabilities</h3>
-                        <ul class="space-y-4">
-                            <li class="p-4 bg-gray-700 rounded-lg">
-                                <h4 class="font-semibold">SQL Injection in Web Portal</h4>
-                                <p class="text-sm text-gray-400">Severity: High</p>
-                                <p class="text-sm text-gray-400">Status: <span class="text-green-500">Fixed</span></p>
-                                <p class="mt-2">Affected systems: 3</p>
-                                <p>Potential impact: Data breach, unauthorized access</p>
-                            </li>
-                            <li class="p-4 bg-gray-700 rounded-lg">
-                                <h4 class="font-semibold">Cross-Site Scripting in User Profile</h4>
-                                <p class="text-sm text-gray-400">Severity: Medium</p>
-                                <p class="text-sm text-gray-400">Status: <span class="text-yellow-500">In Progress</span></p>
-                                <p class="mt-2">Affected systems: 2</p>
-                                <p>Potential impact: Session hijacking, malicious script injection</p>
-                            </li>
-                            <li class="p-4 bg-gray-700 rounded-lg">
-                                <h4 class="font-semibold">Outdated SSL/TLS Version</h4>
-                                <p class="text-sm text-gray-400">Severity: Medium</p>
-                                <p class="text-sm text-gray-400">Status: <span class="text-red-500">Open</span></p>
-                                <p class="mt-2">Affected systems: 5</p>
-                                <p>Potential impact: Man-in-the-middle attacks, data interception</p>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Vulnerability Trends</h3>
-                        <div class="chart-container">
-                            <canvas id="trendChart"></canvas>
+                case 'vulnerabilities':
+                    content.innerHTML = `
+                    <h2 class="text-2xl font-semibold mb-6">Vulnerabilities</h2>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Recent Vulnerabilities -->
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Recent Vulnerabilities</h3>
+                            <ul class="space-y-4">
+                                <li class="p-4 bg-gray-700 rounded-lg">
+                                    <h4 class="font-semibold">SQL Injection in Web Portal</h4>
+                                    <p class="text-sm text-gray-400">Severity: High</p>
+                                    <p class="text-sm text-gray-400">Status: <span class="text-green-500">Fixed</span></p>
+                                    <p class="mt-2">Affected systems: 3</p>
+                                    <p>Potential impact: Data breach, unauthorized access</p>
+                                </li>
+                                <li class="p-4 bg-gray-700 rounded-lg">
+                                    <h4 class="font-semibold">Cross-Site Scripting in User Profile</h4>
+                                    <p class="text-sm text-gray-400">Severity: Medium</p>
+                                    <p class="text-sm text-gray-400">Status: <span class="text-yellow-500">In Progress</span></p>
+                                    <p class="mt-2">Affected systems: 2</p>
+                                    <p>Potential impact: Session hijacking, malicious script injection</p>
+                                </li>
+                                <li class="p-4 bg-gray-700 rounded-lg">
+                                    <h4 class="font-semibold">Outdated SSL/TLS Version</h4>
+                                    <p class="text-sm text-gray-400">Severity: Medium</p>
+                                    <p class="text-sm text-gray-400">Status: <span class="text-red-500">Open</span></p>
+                                    <p class="mt-2">Affected systems: 5</p>
+                                    <p>Potential impact: Man-in-the-middle attacks, data interception</p>
+                                </li>
+                                <li class="p-4 bg-gray-700 rounded-lg">
+                                    <h4 class="font-semibold">Remote Code Execution on File Server</h4>
+                                    <p class="text-sm text-gray-400">Severity: Critical</p>
+                                    <p class="text-sm text-gray-400">Status: <span class="text-red-500">Open</span></p>
+                                    <p class="mt-2">Affected systems: 2</p>
+                                    <p>Potential impact: Complete system compromise, data loss</p>
+                                </li>
+                            </ul>
+                        </div>
+                
+                        <!-- Vulnerability Trends -->
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Vulnerability Trends</h3>
+                            <div class="chart-container">
+                                <canvas id="trendChart"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Top Vulnerable Assets</h3>
-                        <ul class="space-y-2">
-                            <li class="flex justify-between items-center">
-                                <span>Web Server 1</span>
-                                <span class="px-2 py-1 bg-red-500 rounded">High Risk</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span>Database Server</span>
-                                <span class="px-2 py-1 bg-yellow-500 rounded">Medium Risk</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span>Employee Workstation 5</span>
-                                <span class="px-2 py-1 bg-yellow-500 rounded">Medium Risk</span>
-                            </li>
-                            <li class="flex justify-between items-center">
-                                <span>File Server</span>
-                                <span class="px-2 py-1 bg-green-500 rounded">Low Risk</span>
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="bg-gray-800 p-6 rounded-lg">
-                        <h3 class="text-xl font-semibold mb-4">Vulnerability Age Distribution</h3>
-                        <div class="chart-container">
-                            <canvas id="vulnAgeChart"></canvas>
+                
+                    <div class="mt-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Top Vulnerable Assets -->
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Top Vulnerable Assets</h3>
+                            <ul class="space-y-2">
+                                <li class="flex justify-between items-center">
+                                    <span>Web Server 1</span>
+                                    <span class="px-2 py-1 bg-red-500 rounded">High Risk</span>
+                                </li>
+                                <li class="flex justify-between items-center">
+                                    <span>Database Server</span>
+                                    <span class="px-2 py-1 bg-yellow-500 rounded">Medium Risk</span>
+                                </li>
+                                <li class="flex justify-between items-center">
+                                    <span>Employee Workstation 5</span>
+                                    <span class="px-2 py-1 bg-yellow-500 rounded">Medium Risk</span>
+                                </li>
+                                <li class="flex justify-between items-center">
+                                    <span>File Server</span>
+                                    <span class="px-2 py-1 bg-green-500 rounded">Low Risk</span>
+                                </li>
+                                <li class="flex justify-between items-center">
+                                    <span>Backup Server</span>
+                                    <span class="px-2 py-1 bg-red-500 rounded">High Risk</span>
+                                </li>
+                                <li class="flex justify-between items-center">
+                                    <span>Cloud Gateway</span>
+                                    <span class="px-2 py-1 bg-red-500 rounded">Critical Risk</span>
+                                </li>
+                                <li class="flex justify-between items-center">
+                                    <span>Network Router 2</span>
+                                    <span class="px-2 py-1 bg-yellow-500 rounded">Medium Risk</span>
+                                </li>
+                            </ul>
+                        </div>
+                
+                        <!-- Vulnerability Age Distribution -->
+                        <div class="bg-gray-800 p-6 rounded-lg">
+                            <h3 class="text-xl font-semibold mb-4">Vulnerability Age Distribution</h3>
+                            <div class="chart-container">
+                                <canvas id="vulnAgeChart"></canvas>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `;
-                            initVulnerabilityCharts();
-                break;
-            case 'vendors':
+                
+                    <div class="mt-6 bg-gray-800 p-6 rounded-lg">
+    <!-- Recent Patches -->
+    <h3 class="text-xl font-semibold mb-4">Recent Patches</h3>
+    <ul class="space-y-4">
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Security Patch for Web Server</h4>
+            <p class="text-sm text-gray-400">Patch Version: 2.5.1</p>
+            <p class="mt-2">Description: Fixed SQL Injection vulnerability in web application.</p>
+            <p>Deployment Status: <span class="text-green-500">Deployed</span></p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">SSL/TLS Update for File Server</h4>
+            <p class="text-sm text-gray-400">Patch Version: 1.3.3</p>
+            <p class="mt-2">Description: Upgraded outdated SSL/TLS protocols to prevent MITM attacks.</p>
+            <p>Deployment Status: <span class="text-yellow-500">In Progress</span></p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Cross-Site Scripting Fix for User Profile</h4>
+            <p class="text-sm text-gray-400">Patch Version: 3.2.0</p>
+            <p class="mt-2">Description: Mitigated XSS vulnerabilities by sanitizing user inputs.</p>
+            <p>Deployment Status: <span class="text-green-500">Deployed</span></p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Kernel Update for Critical Systems</h4>
+            <p class="text-sm text-gray-400">Patch Version: 5.8.12</p>
+            <p class="mt-2">Description: Resolved privilege escalation vulnerabilities in the Linux kernel.</p>
+            <p>Deployment Status: <span class="text-red-500">Pending</span></p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">DNS Cache Poisoning Fix</h4>
+            <p class="text-sm text-gray-400">Patch Version: 4.1.0</p>
+            <p class="mt-2">Description: Fixed vulnerabilities that allowed DNS spoofing and redirection.</p>
+            <p>Deployment Status: <span class="text-green-500">Deployed</span></p>
+        </li>
+    </ul>
+</div>
+
+<div class="mt-6 bg-gray-800 p-6 rounded-lg">
+    <!-- Security Best Practices -->
+    <h3 class="text-xl font-semibold mb-4">Security Best Practices</h3>
+    <ul class="space-y-4">
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Implement Regular Patch Management</h4>
+            <p>Ensure timely patching of all systems to minimize security risks.</p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Use Strong Authentication Mechanisms</h4>
+            <p>Implement multi-factor authentication (MFA) to secure access.</p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Encrypt Sensitive Data</h4>
+            <p>Ensure data encryption both at rest and in transit to prevent unauthorized access.</p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Conduct Regular Security Audits</h4>
+            <p>Periodically review system logs and perform vulnerability assessments to identify risks early.</p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Educate Employees on Cybersecurity</h4>
+            <p>Provide regular training sessions to employees to help them identify phishing attempts and other threats.</p>
+        </li>
+        <li class="p-4 bg-gray-700 rounded-lg">
+            <h4 class="font-semibold">Limit Access with Role-Based Permissions</h4>
+            <p>Grant access to sensitive data and systems based on the principle of least privilege.</p>
+        </li>
+    </ul>
+</div>
+
+                    `;
+                    initVulnerabilityCharts();
+                    break;
+                                      case 'vendors':
                 content.innerHTML = `
                 <h2 class="text-2xl font-semibold mb-6">Vendors and Products</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -526,7 +702,7 @@ function changePage(page) {
                     </div>
                 </div>
             `;
-                            initSolutionCharts();
+                initSolutionCharts();
                 break;
             case 'alerts':
                 content.innerHTML = `
@@ -588,8 +764,8 @@ function changePage(page) {
                     </div>
                 </div>
             `;
-                            initAlertCharts();
-                document.getElementById('alertForm').addEventListener('submit', function(e) {
+                initAlertCharts();
+                document.getElementById('alertForm').addEventListener('submit', function (e) {
                     e.preventDefault();
                     alert('Alert preferences saved! Integration with notification services would be implemented here.');
                 });
@@ -673,11 +849,11 @@ function changePage(page) {
     </div>
     </div>
     `;
-                    document.getElementById('notificationForm').addEventListener('submit', function(e) {
+                document.getElementById('notificationForm').addEventListener('submit', function (e) {
                     e.preventDefault();
                     alert('Notification preferences saved!');
                 });
-                document.getElementById('securityForm').addEventListener('submit', function(e) {
+                document.getElementById('securityForm').addEventListener('submit', function (e) {
                     e.preventDefault();
                     alert('Security settings updated!');
                 });
@@ -791,6 +967,93 @@ function initCharts() {
 }
 
 function initVulnerabilityCharts() {
+    const trendCtx = document.getElementById('trendChart').getContext('2d');
+    new Chart(trendCtx, {
+        type: 'line',
+        data: {
+            labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+            datasets: [{
+                label: 'Vulnerabilities Over Time',
+                data: [15, 20, 18, 22, 25, 30, 35, 40, 45, 50, 55, 60], // Example data
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    const vulnAgeCtx = document.getElementById('vulnAgeChart').getContext('2d');
+    new Chart(vulnAgeCtx, {
+        type: 'bar',
+        data: {
+            labels: ['0-1 months', '1-3 months', '3-6 months', '6+ months'],
+            datasets: [{
+                label: 'Vulnerabilities Age Distribution',
+                data: [30, 40, 15, 25], // Example data
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    const severityCtx = document.getElementById('severityChart').getContext('2d');
+    new Chart(severityCtx, {
+        type: 'pie',
+        data: {
+            labels: ['Critical', 'High', 'Medium', 'Low'],
+            datasets: [{
+                label: 'Vulnerability Severity',
+                data: [15, 30, 25, 30], // Example data
+                backgroundColor: ['rgba(255, 99, 132, 0.2)', 'rgba(255, 159, 64, 0.2)', 'rgba(255, 205, 86, 0.2)', 'rgba(75, 192, 192, 0.2)'],
+                borderColor: ['rgba(255, 99, 132, 1)', 'rgba(255, 159, 64, 1)', 'rgba(255, 205, 86, 1)', 'rgba(75, 192, 192, 1)'],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true
+        }
+    });
+    const ctx = document.getElementById('severityChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'pie',
+        data: {
+            labels: ['High', 'Medium', 'Low'], // Severity levels
+            datasets: [{
+                data: [60, 30, 10], // Data for each severity level (example data)
+                backgroundColor: ['#ff0000', '#ffcc00', '#00cc00'], // Colors for the chart
+            }],
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    position: 'top',
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function (tooltipItem) {
+                            return tooltipItem.label + ': ' + tooltipItem.raw + '%';
+                        }
+                    }
+                }
+            }
+        }
+    });
     new Chart(document.getElementById('trendChart').getContext('2d'), {
         type: 'line',
         data: {
@@ -1010,7 +1273,7 @@ function init3DScene() {
 
     // Create multiple interconnected spheres representing network nodes
     const sphereGeometry = new THREE.SphereGeometry(0.5, 32, 32);
-    const sphereMaterial = new THREE.MeshBasicMaterial({color: 0x3B82F6});
+    const sphereMaterial = new THREE.MeshBasicMaterial({ color: 0x3B82F6 });
 
     const positions = [
         [-2, 0, 0], [2, 0, 0], [0, 2, 0], [0, -2, 0], [0, 0, 2], [0, 0, -2],
@@ -1087,9 +1350,9 @@ function showLoading() {
     content.innerHTML = '<div class="flex justify-center items-center h-full"><div class="animate-spin rounded-full h-32 w-32 border-t-2 border-b-2 border-blue-500"></div></div>';
 }
 const originalChangePage = changePage;
- changePage = (page) => {
-     showLoading();
-     setTimeout(() => {
-         originalChangePage(page);
-     }, 500);
- };
+changePage = (page) => {
+    showLoading();
+    setTimeout(() => {
+        originalChangePage(page);
+    }, 500);
+};
