@@ -1,0 +1,614 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Signup - HAWK</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+    
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #1e293b, #0f172a);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+      color: white;
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .signup-container {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 20px;
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+      padding: 2.5rem;
+      max-width: 450px;
+      width: 90%;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .signup-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: 0.5s;
+    }
+
+    .signup-container:hover::before {
+      left: 100%;
+    }
+
+    .signup-container h2 {
+      font-size: 2.5rem;
+      margin-bottom: 1.5rem;
+      background: linear-gradient(135deg, #60a5fa, #3b82f6);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      text-align: center;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .form-group {
+      margin-bottom: 1.5rem;
+      position: relative;
+    }
+
+    .form-group input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 2px solid transparent;
+      border-radius: 12px;
+      color: white;
+      width: 100%;
+      padding: 1rem 1.25rem;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+    }
+
+    .form-group input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+      transition: 0.3s ease;
+    }
+
+    .form-group input:focus::placeholder {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+
+    .signup-btn {
+      background: linear-gradient(135deg, #3b82f6, #2563eb);
+      color: white;
+      font-weight: 600;
+      font-size: 1.1rem;
+      border: none;
+      padding: 1rem;
+      width: 100%;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: all 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .signup-btn::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.2),
+        transparent
+      );
+      transition: 0.5s;
+    }
+
+    .signup-btn:hover::before {
+      left: 100%;
+    }
+
+    .signup-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(37, 99, 235, 0.4);
+    }
+
+    .signup-btn:active {
+      transform: translateY(0);
+    }
+
+    .divider {
+      text-align: center;
+      margin: 2rem 0;
+      position: relative;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 45%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, #9ca3af, transparent);
+    }
+
+    .divider::before {
+      left: 0;
+    }
+
+    .divider::after {
+      right: 0;
+    }
+
+    .divider span {
+      color: #9ca3af;
+      font-size: 0.9rem;
+      background: #0f172a;
+      padding: 0 1rem;
+      position: relative;
+      z-index: 1;
+    }
+
+    .success-message {
+      position: fixed;
+      top: 20px;
+      right: -300px;
+      background: rgba(16, 185, 129, 0.9);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      transition: 0.5s ease;
+    }
+
+    .success-message.show {
+      right: 20px;
+    }
+
+    @keyframes shake {
+      0%, 100% { transform: translateX(0); }
+      25% { transform: translateX(-5px); }
+      75% { transform: translateX(5px); }
+    }
+
+    .error {
+      animation: shake 0.5s ease-in-out;
+      border-color: #ef4444 !important;
+    }
+    .success-message {
+      position: fixed;
+      top: 20px;
+      right: -300px;
+      background: rgba(16, 185, 129, 0.9);
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      transition: 0.5s ease;
+      opacity: 0;
+      visibility: hidden;  /* Hide by default */
+      pointer-events: none;  /* Prevent interaction when hidden */
+    }
+
+    .success-message.show {
+      right: 20px;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+
+    
+    .otp-container {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin: 1rem 0;
+    }
+
+    .otp-input {
+      width: 50px;
+      height: 50px;
+      text-align: center;
+      font-size: 1.2rem;
+      border-radius: 8px;
+      border: 2px solid transparent;
+      background: rgba(255, 255, 255, 0.08);
+      color: white;
+      transition: all 0.3s ease;
+    }
+
+    .otp-input:focus {
+      border-color: #60a5fa;
+      box-shadow: 0 0 15px rgba(96, 165, 250, 0.3);
+      outline: none;
+    }
+
+    .message-popup {
+      position: fixed;
+      top: 20px;
+      right: -300px;
+      padding: 1rem 2rem;
+      border-radius: 8px;
+      transition: 0.5s ease;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      color: white;
+      font-weight: 500;
+    }
+
+    .message-popup.success {
+      background: rgba(16, 185, 129, 0.9);
+    }
+
+    .message-popup.error {
+      background: rgba(239, 68, 68, 0.9);
+    }
+
+    .message-popup.warning {
+      background: rgba(245, 158, 11, 0.9);
+    }
+
+    .message-popup.show {
+      right: 20px;
+      opacity: 1;
+      visibility: visible;
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+    <div class="signup-container">
+        <h2>Sign Up</h2>
+        <form id="signupForm">
+          <div class="form-group">
+            <input type="text" id="name" placeholder="Organization Name" required />
+          </div>
+          <div class="form-group">
+            <input type="email" id="email" placeholder="Email Address" required />
+          </div>
+          <div class="form-group">
+            <input type="password" id="password" placeholder="Password" required />
+          </div>
+          <div class="form-group">
+            <input type="password" id="confirmPassword" placeholder="Confirm Password" required />
+          </div>
+          <button type="button" id="getOtpBtn" class="signup-btn">Get OTP</button>
+          <div id="otpSection" style="display: none;">
+            <div class="otp-container">
+              <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+              <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+              <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+              <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+              <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+              <input type="text" class="otp-input" maxlength="1" pattern="[0-9]" inputmode="numeric">
+            </div>
+            <button type="button" id="submitOtpBtn" class="signup-btn">Verify OTP</button>
+          </div>
+        </form>
+        <div class="divider">
+          <span>or</span>
+        </div>
+        <button onclick="redirectToLogin()" class="signup-btn bg-gray-600 hover:bg-gray-700">
+          Go to Login
+        </button>
+    </div>
+
+    <div id="messagePopup" class="message-popup">
+        Signup successful! Welcome aboard! 🚀    </div>
+
+  <div id="successMessage" class="success-message">
+    
+  </div>
+
+  <script>
+    // Initial animation
+gsap.from(".signup-container", {
+  y: 100,
+  opacity: 0,
+  duration: 1,
+  ease: "power3.out"
+});
+
+// Stagger form elements
+gsap.from(".form-group", {
+  y: 20,
+  opacity: 0,
+  duration: 0.8,
+  stagger: 0.2,
+  ease: "power2.out",
+  delay: 0.5
+});
+
+function redirectToLogin() {
+  gsap.to(".signup-container", {
+    opacity: 0,
+    y: -50,
+    duration: 0.5,
+    ease: "power2.in",
+    onComplete: () => {
+      window.location.href = "login.html";
+    }
+  });
+}
+
+// Form validation and submission
+document.getElementById("signupForm").addEventListener("submit", async function(event) {
+  event.preventDefault();
+  
+  const inputs = this.querySelectorAll('input');
+  let isValid = true;
+
+  inputs.forEach(input => {
+    input.classList.remove('error');
+    
+    if (!input.value.trim()) {
+      input.classList.add('error');
+      isValid = false;
+    }
+  });
+
+  const password = document.getElementById("password");
+  const confirmPassword = document.getElementById("confirmPassword");
+
+  if (password.value !== confirmPassword.value) {
+    password.classList.add('error');
+    confirmPassword.classList.add('error');
+    isValid = false;
+    return;
+  }
+
+  if (isValid) {
+    const submitBtn = this.querySelector('button[type="submit"]');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = 'Creating Account...';
+
+    try {
+      // Simulate API call - replace this with your actual signup API call
+      await new Promise(resolve => setTimeout(resolve, 1500));
+
+      // Success animation
+      const successMessage = document.getElementById("successMessage");
+      successMessage.classList.add("show");
+      
+      gsap.to(".signup-container", {
+        scale: 1.02,
+        duration: 0.3,
+        ease: "power2.out",
+        yoyo: true,
+        repeat: 1
+      });
+
+      // Hide success message after 3 seconds
+      setTimeout(() => {
+        successMessage.classList.remove("show");
+        // Redirect to dashboard or next page
+        // window.location.href = "dashboard.html";
+      }, 3000);
+
+    } catch (error) {
+      console.error('Signup failed:', error);
+      // Handle error case
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'Create Account';
+    }
+  }
+});
+
+// Input focus animations
+const inputs = document.querySelectorAll('input');
+inputs.forEach(input => {
+  input.addEventListener('focus', () => {
+    gsap.to(input, {
+      scale: 1.02,
+      duration: 0.2,
+      ease: "power2.out"
+    });
+  });
+
+  input.addEventListener('blur', () => {
+    gsap.to(input, {
+      scale: 1,
+      duration: 0.2,
+      ease: "power2.in"
+    });
+  });
+});
+
+document.getElementById("signupForm").addEventListener("submit", async function(event) {
+      event.preventDefault();
+      
+      const inputs = this.querySelectorAll('input');
+      let isValid = true;
+
+      inputs.forEach(input => {
+        input.classList.remove('error');
+        
+        if (!input.value.trim()) {
+          input.classList.add('error');
+          isValid = false;
+        }
+      });
+
+      const password = document.getElementById("password");
+      const confirmPassword = document.getElementById("confirmPassword");
+
+      if (password.value !== confirmPassword.value) {
+        password.classList.add('error');
+        confirmPassword.classList.add('error');
+        isValid = false;
+        return;
+      }
+
+      if (isValid) {
+        const submitBtn = this.querySelector('button[type="submit"]');
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = 'Creating Account...';
+
+        try {
+          // Simulate API call - replace this with your actual signup API call
+          await new Promise(resolve => setTimeout(resolve, 1500));
+
+          // Show success message
+          const successMessage = document.getElementById("successMessage");
+          successMessage.setAttribute('aria-hidden', 'false');
+          successMessage.classList.add("show");
+          
+          gsap.to(".signup-container", {
+            scale: 1.02,
+            duration: 0.3,
+            ease: "power2.out",
+            yoyo: true,
+            repeat: 1
+          });
+
+          // Hide success message after 3 seconds
+          setTimeout(() => {
+            successMessage.classList.remove("show");
+            successMessage.setAttribute('aria-hidden', 'true');
+            // Optionally redirect after success
+            // window.location.href = "dashboard.html";
+          }, 3000);
+
+        } catch (error) {
+          console.error('Signup failed:', error);
+          // Handle error case here
+        } finally {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = 'Create Account';
+        }
+      }
+    });
+
+    function showMessage(message, type = 'success') {
+            const popup = document.getElementById('messagePopup');
+            popup.textContent = message;
+            popup.className = 'message-popup';
+            popup.classList.add(type);
+            popup.classList.add('show');
+
+            setTimeout(() => {
+                popup.classList.remove('show');
+            }, 3000);
+        }
+
+        // Handle OTP input boxes
+        const otpInputs = document.querySelectorAll('.otp-input');
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1) {
+                    if (index < otpInputs.length - 1) {
+                        otpInputs[index + 1].focus();
+                    }
+                }
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // Get OTP Button Handler
+        document.getElementById('getOtpBtn').addEventListener('click', async () => {
+            const name = document.getElementById('name').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const confirmPassword = document.getElementById('confirmPassword').value.trim();
+
+            if (!name || !email || !password || !confirmPassword) {
+                showMessage('Please fill all the required fields', 'error');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showMessage('Passwords do not match', 'error');
+                return;
+            }
+
+            try {
+                // Simulate API call for OTP generation
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                document.getElementById('otpSection').style.display = 'block';
+                showMessage('OTP sent successfully! Please check your email.', 'success');
+            } catch (error) {
+                showMessage('Failed to send OTP. Please try again.', 'error');
+            }
+        });
+
+        // Submit OTP Button Handler
+        document.getElementById('submitOtpBtn').addEventListener('click', async () => {
+            const otp = Array.from(otpInputs).map(input => input.value).join('');
+            
+            if (otp.length !== 6) {
+                showMessage('Please enter complete OTP', 'warning');
+                return;
+            }
+
+            try {
+                // Simulate API call for OTP verification and signup
+                await new Promise(resolve => setTimeout(resolve, 1500));
+                showMessage('Signup successful! Redirecting to admin registration...', 'success');
+                
+                // Redirect to admin registration after 2 seconds
+                setTimeout(() => {
+                    window.location.href = 'admin-registration.html';
+                }, 2000);
+            } catch (error) {
+                showMessage('Verification failed. Please try again.', 'error');
+            }
+        });
+
+        // Focus animations for OTP inputs
+        otpInputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                gsap.to(input, {
+                    scale: 1.1,
+                    duration: 0.2,
+                    ease: "power2.out"
+                });
+            });
+
+            input.addEventListener('blur', () => {
+                gsap.to(input, {
+                    scale: 1,
+                    duration: 0.2,
+                    ease: "power2.in"
+                });
+            });
+        });
+    
+  </script>
+</body>
+</html>
