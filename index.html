@@ -135,56 +135,59 @@
     <div id="loader"></div>
     <div id="main-content" class="hidden">
         <div class="flex h-screen">
-            <!-- Sidebar -->
-            <nav class="sidebar w-64 bg-gray-800 p-4">
-                <div class="flex items-center justify-between mb-8">
-                    <div class="flex items-center">
-                        <div class="w-12 h-12 p-1">
-                            <img src="assests/Hawk.png" alt="Hawk logo image" class="rounded-full mr-4">
-                        </div>
-                        <h1 class="text-2xl font-bold">HAWK</h1>
-                    </div>
-                    <button class="close-btn text-white text-xl">&times;</button>
+          <!-- Sidebar -->
+          <nav class="sidebar w-64 bg-gray-800 p-4 flex-shrink-0 md:block md:w-64">
+            <div class="flex items-center justify-between mb-8">
+              <div class="flex items-center">
+                <div class="w-12 h-12 p-1">
+                  <img src="assests/Hawk.png" alt="Hawk logo image" class="rounded-full mr-4">
                 </div>
-                <ul>
-                    <li><button class="w-full text-left py-2 px-4 rounded mb-2 active-nav" onclick="changePage('dashboard')"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</button></li>
-                    <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('vulnerabilities')"><i class="fas fa-shield-alt mr-2"></i>Vulnerabilities</button></li>
-                    <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('vendors')"><i class="fas fa-building mr-2"></i>Vendors and Products</button></li>
-                    <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('solutions')"><i class="fas fa-tools mr-2"></i>Solutions</button></li>
-                    <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('alerts')"><i class="fas fa-bell mr-2"></i>Alerts</button></li>
-                    <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('settings')"><i class="fas fa-cog mr-2"></i>Settings</button></li>
-                </ul>
-            </nav>
-
-            <!-- Main content -->
-            <div class="flex-1 overflow-hidden flex flex-col">
-                <!-- Header -->
-                <header class="bg-gray-800 p-4 flex justify-between items-center">
-                    <div class="flex items-center flex-grow">
-                        <button class="hamburger mr-4 text-xl">&#9776;</button>
-                        <input type="text" placeholder="Search" class="search-bar bg-gray-700 px-4 py-2 rounded-lg mr-4 flex-grow max-w-xs">
-                    </div>
-                    <div class="flex items-center">
-                        <span class="hidden sm:inline mr-4">OEM Server 1</span>
-                        <button class="mr-4"><i class="fas fa-bell"></i></button>
-                        <a href="signup.html" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-4">Signup</a>
-                        <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mr-4">Login</button>
-                        <div class="w-8 h-8 bg-gray-500 rounded-full">
-                            <img src="assests/download.jpeg" alt="Login person Image" class="rounded-full">
-                        </div>
-                    </div>
-                </header>
-                
-
-                <!-- Page content -->
-                <main class="flex-1 overflow-y-auto p-6" id="pageContent">
-                    <!-- Dashboard content will be loaded here -->
-                </main>
+                <h1 class="text-2xl font-bold text-white">HAWK</h1>
+              </div>
+              <button class="close-btn text-white text-xl md:hidden">&times;</button>
             </div>
-        </div>
-    </div>
+            <ul>
+              <li><button class="w-full text-left py-2 px-4 rounded mb-2 active-nav" onclick="changePage('dashboard')"><i class="fas fa-tachometer-alt mr-2"></i>Dashboard</button></li>
+              <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('vulnerabilities')"><i class="fas fa-shield-alt mr-2"></i>Vulnerabilities</button></li>
+              <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('vendors')"><i class="fas fa-building mr-2"></i>Vendors and Products</button></li>
+              <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('solutions')"><i class="fas fa-tools mr-2"></i>Solutions</button></li>
+              <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('alerts')"><i class="fas fa-bell mr-2"></i>Alerts</button></li>
+              <li><button class="w-full text-left py-2 px-4 rounded mb-2" onclick="changePage('settings')"><i class="fas fa-cog mr-2"></i>Settings</button></li>
+            </ul>
+          </nav>
+      
+          <!-- Main content -->
+          <div class="flex-1 overflow-hidden flex flex-col">
+            <!-- Header -->
+            <header class="bg-gray-800 p-4 flex justify-between items-center">
+              <div class="flex items-center flex-grow">
+                <button class="hamburger mr-4 text-xl md:hidden">&#9776;</button>
+                <input type="text" placeholder="Search" class="search-bar bg-gray-700 px-4 py-2 rounded-lg mr-4 flex-grow max-w-xs">
+              </div>
+              <div class="flex items-center">
+                <span class="hidden sm:inline mr-4 text-white">OEM Server 1</span>
+                <button class="mr-4 text-white"><i class="fas fa-bell"></i></button>
+                <a href="signup.html" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg mr-4">Signup</a>
+                <button class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded-lg mr-4">Login</button>
+                <div class="w-8 h-8 bg-gray-500 rounded-full">
+                  <img src="assests/download.jpeg" alt="Login person Image" class="rounded-full">
+                </div>
+              </div>
+            </header>
+
+            <main class="flex-1 overflow-y-auto p-6" id="pageContent">
+                <!-- Dashboard content will be loaded here -->
+              </main>
     <script src="script.js"></script>
     <script>
+
+document.querySelector('.hamburger').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.toggle('hidden');
+  });
+
+  document.querySelector('.close-btn').addEventListener('click', () => {
+    document.querySelector('.sidebar').classList.add('hidden');
+  });
         document.addEventListener('DOMContentLoaded', function() {
             const hamburger = document.querySelector('.hamburger');
             const closeBtn = document.querySelector('.close-btn');
