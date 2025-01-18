@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hawk Security</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a192f 0%, #172a45 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            padding: 2rem;
+            background: rgba(10, 25, 47, 0.3);
+            border-radius: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            box-shadow: 0 0 30px rgba(100, 255, 218, 0.1);
+        }
+
+        .welcome-text {
+            color: #64ffda;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeInDown 1s ease forwards;
+            text-shadow: 0 0 10px rgba(100, 255, 218, 0.5);
+        }
+
+        .tagline {
+            color: #8892b0;
+            font-size: 1.2rem;
+            margin: 1rem 0;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards 1.5s;
+        }
+
+        .main-heading {
+            color: #ffffff;
+            font-size: 3rem;
+            margin-bottom: 3rem;
+            opacity: 0;
+            transform: translateY(-20px);
+            animation: fadeInDown 1s ease forwards 0.5s;
+            position: relative;
+        }
+
+        .main-heading::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            background: #64ffda;
+            animation: lineExpand 1s ease forwards 1s;
+        }
+
+        .btn {
+            padding: 1rem 3rem;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 10px;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .btn-primary {
+            background: #64ffda;
+            color: #0a192f;
+            animation: fadeIn 1s ease forwards 1s;
+        }
+
+        .btn-secondary {
+            background: transparent;
+            color: #64ffda;
+            border: 2px solid #64ffda;
+            animation: fadeIn 1s ease forwards 1.2s;
+        }
+
+        .btn:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg,
+                transparent,
+                rgba(255, 255, 255, 0.2),
+                transparent
+            );
+            transition: 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
+        .action-buttons {
+            display: none;
+            gap: 20px;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 1s ease forwards;
+        }
+
+        .cyber-circuit {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .circuit-line {
+            position: absolute;
+            background: rgba(100, 255, 218, 0.1);
+            transform-origin: left;
+        }
+
+        .security-icon {
+            font-size: 3rem;
+            color: #64ffda;
+            margin-bottom: 1rem;
+            opacity: 0;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes fadeInDown {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes lineExpand {
+            to {
+                width: 60%;
+            }
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+            50% {
+                transform: scale(1.05);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+                opacity: 0.5;
+            }
+        }
+
+        /* Enhanced particle effect */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: rgba(100, 255, 218, 0.5);
+            border-radius: 50%;
+            animation: float 20s linear infinite;
+        }
+
+        .radar-scan {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 300px;
+            height: 300px;
+            border-radius: 50%;
+            border: 2px solid rgba(100, 255, 218, 0.1);
+            transform: translate(-50%, -50%);
+        }
+
+        .radar-beam {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 150px;
+            height: 2px;
+            background: linear-gradient(90deg, rgba(100, 255, 218, 0.5), transparent);
+            transform-origin: left;
+            animation: radarScan 4s linear infinite;
+        }
+
+        @keyframes radarScan {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) scale(1);
+                opacity: 0;
+            }
+            50% {
+                opacity: 1;
+                transform: translateY(-50vh) translateX(50vw) scale(1.5);
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100vw) scale(1);
+                opacity: 0;
+            }
+        }
+
+        /* Typing effect */
+        .typing-effect {
+            border-right: 3px solid #64ffda;
+            white-space: nowrap;
+            overflow: hidden;
+            animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite;
+        }
+
+        @keyframes typing {
+            from { width: 0 }
+            to { width: 100% }
+        }
+
+        @keyframes blink-caret {
+            from, to { border-color: transparent }
+            50% { border-color: #64ffda }
+        }
+    </style>
+</head>
+<body>
+    <div class="particles">
+        <!-- Particles will be added via JavaScript -->
+    </div>
+    
+    <div class="radar-scan">
+        <div class="radar-beam"></div>
+    </div>
+
+    <div class="container">
+        <div class="cyber-circuit"></div>
+        <div class="security-icon"><img src="assests/hawkLogo.png" alt=""></div>
+        <div class="welcome-text typing-effect">Welcome to</div>
+        <h1 class="main-heading">HAWK</h1>
+        <div class="tagline">Protecting your digital world with precision and power</div>
+        <h2 class="main-heading">Are you ready to safeguard your device?</h2>
+        
+        <button class="btn btn-primary" id="yesButton">YES!!</button>
+        
+        <div class="action-buttons" id="actionButtons">
+            <button class="btn btn-secondary">Sign Up for Organizations</button>
+            <button class="btn btn-secondary">Login</button>
+        </div>
+    </div>
+
+    <script>
+        // Enhanced particle system
+        const particlesContainer = document.querySelector('.particles');
+        for (let i = 0; i < 50; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + 'vw';
+            particle.style.top = Math.random() * 100 + 'vh';
+            particle.style.width = Math.random() * 3 + 'px';
+            particle.style.height = particle.style.width;
+            particle.style.animationDelay = Math.random() * 20 + 's';
+            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+            particlesContainer.appendChild(particle);
+        }
+
+        // Create cyber circuit effect
+        const circuitContainer = document.querySelector('.cyber-circuit');
+        for (let i = 0; i < 20; i++) {
+            const line = document.createElement('div');
+            line.className = 'circuit-line';
+            const width = Math.random() * 100 + 50;
+            const height = 2;
+            const top = Math.random() * 100;
+            const left = Math.random() * 100;
+            const rotation = Math.random() * 360;
+            
+            line.style.width = width + 'px';
+            line.style.height = height + 'px';
+            line.style.top = top + '%';
+            line.style.left = left + '%';
+            line.style.transform = `rotate(${rotation}deg)`;
+            
+            circuitContainer.appendChild(line);
+        }
+
+        // Handle button clicks with enhanced animation
+        document.getElementById('yesButton').addEventListener('click', function() {
+            this.style.animation = 'fadeOut 0.5s ease forwards';
+            setTimeout(() => {
+                this.style.display = 'none';
+                const actionButtons = document.getElementById('actionButtons');
+                actionButtons.style.display = 'flex';
+                actionButtons.style.animation = 'fadeIn 0.5s ease forwards';
+            }, 500);
+        });
+    </script>
+</body>
+</html>
